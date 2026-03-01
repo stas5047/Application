@@ -32,9 +32,9 @@ async function bootstrap(): Promise<void> {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('BACKEND_PORT') ?? 3000;
+  const logger = new Logger('Bootstrap');
 
   await app.listen(port);
-  const logger = new Logger('Bootstrap');
   logger.log(`Application is running on port ${port}`);
 }
 
