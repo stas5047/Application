@@ -183,6 +183,8 @@ export class EventsService {
   async leave(id: string, userId: string): Promise<EventDetailResponseDto> {
     const event = await this.findWithParticipantsOrFail(id);
     this.assertEventVisible(event, userId);
+    if (event.organizerId === userId)
+      throw new BadRequestException('Organizer cannot leave their own event');
     if (!event.participants.some((p) => p.id === userId))
       throw new ConflictException('You are not a participant of this event');
     await this.repo

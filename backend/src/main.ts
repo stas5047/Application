@@ -9,7 +9,12 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
-  app.enableCors();
+
+  const configService = app.get(ConfigService);
+  app.enableCors({
+    origin: configService.get<string>('FRONTEND_ORIGIN') ?? '*',
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -30,7 +35,6 @@ async function bootstrap(): Promise<void> {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const configService = app.get(ConfigService);
   const port = configService.get<number>('BACKEND_PORT') ?? 3000;
   const logger = new Logger('Bootstrap');
 
