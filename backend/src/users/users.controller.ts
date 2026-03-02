@@ -1,9 +1,10 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiOkResponse,
   ApiOperation,
-  ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -11,7 +12,7 @@ import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { UsersService } from './users.service';
 import { MyEventResponseDto } from './dto/my-event-response.dto';
 
-@ApiTags('users')
+@ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
@@ -23,8 +24,8 @@ export class UsersController {
     summary:
       'Get all events for the authenticated user (organizer or participant)',
   })
-  @ApiResponse({ status: 200, type: [MyEventResponseDto] })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOkResponse({ type: [MyEventResponseDto] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   getMyEvents(
     @Req() req: Request & { user: AuthenticatedUser },
   ): Promise<MyEventResponseDto[]> {

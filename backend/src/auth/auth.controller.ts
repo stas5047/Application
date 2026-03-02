@@ -14,6 +14,7 @@ import {
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -30,12 +31,13 @@ interface RequestWithUser extends ExpressRequest {
   user: AuthenticatedUser;
 }
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @ApiOperation({ summary: 'Register a new user account' })
   @ApiCreatedResponse({ type: AuthResponseDto })
   @ApiConflictResponse({ description: 'Email already in use' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
@@ -45,6 +47,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login with email and password' })
   @ApiOkResponse({ type: AuthResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
@@ -54,6 +57,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh access token using a valid refresh token' })
   @ApiOkResponse({ type: AuthResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
@@ -65,6 +69,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Logout and invalidate the refresh token' })
   @ApiNoContentResponse({ description: 'Logged out successfully' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
   async logout(@Req() req: RequestWithUser): Promise<void> {

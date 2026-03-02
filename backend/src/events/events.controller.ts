@@ -11,7 +11,19 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../common/guards/optional-jwt-auth.guard';
@@ -24,7 +36,7 @@ import {
   EventSummaryResponseDto,
 } from './dto/event-response.dto';
 
-@ApiTags('events')
+@ApiTags('Events')
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
@@ -32,6 +44,7 @@ export class EventsController {
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Get all public events' })
+  @ApiOkResponse({ type: [EventSummaryResponseDto] })
   findAll(
     @Req() req: Request & { user: AuthenticatedUser | null },
   ): Promise<EventSummaryResponseDto[]> {
@@ -41,6 +54,8 @@ export class EventsController {
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Get event by ID' })
+  @ApiOkResponse({ type: EventDetailResponseDto })
+  @ApiNotFoundResponse({ description: 'Event not found' })
   findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: Request & { user: AuthenticatedUser | null },
@@ -52,6 +67,11 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new event' })
+  @ApiCreatedResponse({ type: EventDetailResponseDto })
+  @ApiBadRequestResponse({
+    description: 'Validation failed or date in the past',
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   create(
     @Body() dto: CreateEventDto,
     @Req() req: Request & { user: AuthenticatedUser },
@@ -63,6 +83,12 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an event (organizer only)' })
+  @ApiOkResponse({ type: EventDetailResponseDto })
+  @ApiForbiddenResponse({
+    description: 'Only the organizer can modify this event',
+  })
+  @ApiNotFoundResponse({ description: 'Event not found' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateEventDto,
@@ -76,6 +102,12 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an event (organizer only)' })
+  @ApiNoContentResponse({ description: 'Event deleted' })
+  @ApiForbiddenResponse({
+    description: 'Only the organizer can delete this event',
+  })
+  @ApiNotFoundResponse({ description: 'Event not found' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   remove(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: Request & { user: AuthenticatedUser },
@@ -88,6 +120,13 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Join an event' })
+  @ApiOkResponse({ type: EventDetailResponseDto })
+  @ApiConflictResponse({
+    description:
+      'User has already joined this event or event is at full capacity',
+  })
+  @ApiNotFoundResponse({ description: 'Event not found' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   join(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: Request & { user: AuthenticatedUser },
@@ -100,6 +139,12 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Leave an event' })
+  @ApiOkResponse({ type: EventDetailResponseDto })
+  @ApiConflictResponse({
+    description: 'User is not a participant of this event',
+  })
+  @ApiNotFoundResponse({ description: 'Event not found' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   leave(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: Request & { user: AuthenticatedUser },
