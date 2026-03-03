@@ -42,17 +42,17 @@ services:
       db:
         condition: service_healthy
 
-  frontend:
-    build: ./frontend
-    restart: unless-stopped
-    env_file:
-      - ./docker/.env
-    environment:
-      VITE_API_URL: ${VITE_API_URL}
-    ports:
-      - '80:80'
-    depends_on:
-      - backend
+  # frontend:
+  #   build: ./frontend
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./docker/.env
+  #   environment:
+  #     VITE_API_URL: ${VITE_API_URL}
+  #   ports:
+  #     - '80:80'
+  #   depends_on:
+  #     - backend
 
 volumes:
   postgres_data:
