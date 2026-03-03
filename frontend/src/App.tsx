@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { useAuthStore } from '@/store/auth.store';
+import { PageLoader } from '@/components/ui/page-loader';
 
 function PlaceholderPage({ label }: { label: string }) {
   return (
@@ -14,11 +15,7 @@ export default function App() {
   const isHydrated = useAuthStore((s) => s.isHydrated);
 
   if (!isHydrated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
