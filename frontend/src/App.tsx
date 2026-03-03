@@ -2,10 +2,14 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { useAuthStore } from '@/store/auth.store';
 import { PageLoader } from '@/components/ui/page-loader';
+import AppLayout from '@/components/layout/AppLayout';
+import ProtectedRoute from '@/components/layout/ProtectedRoute';
+import LoginPage from '@/features/auth/LoginPage';
+import SignUpPage from '@/features/auth/SignUpPage';
 
 function PlaceholderPage({ label }: { label: string }) {
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-[60vh] items-center justify-center">
       <p className="text-muted-foreground text-lg">{label}</p>
     </div>
   );
@@ -22,25 +26,20 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<Navigate to="/events" replace />} />
-        <Route path="/login" element={<PlaceholderPage label="Login — Phase 9" />} />
-        <Route path="/signup" element={<PlaceholderPage label="Sign Up — Phase 9" />} />
-        <Route path="/events" element={<PlaceholderPage label="Events — Phase 10" />} />
-        <Route
-          path="/events/create"
-          element={<PlaceholderPage label="Create Event — Phase 12" />}
-        />
-        <Route
-          path="/events/:id"
-          element={<PlaceholderPage label="Event Details — Phase 11" />}
-        />
-        <Route
-          path="/events/:id/edit"
-          element={<PlaceholderPage label="Edit Event — Phase 12" />}
-        />
-        <Route
-          path="/my-events"
-          element={<PlaceholderPage label="My Events — Phase 13" />}
-        />
+
+        <Route element={<AppLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/events" element={<PlaceholderPage label="Events — Phase 10" />} />
+          <Route path="/events/:id" element={<PlaceholderPage label="Event Details — Phase 11" />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/events/create" element={<PlaceholderPage label="Create Event — Phase 12" />} />
+            <Route path="/events/:id/edit" element={<PlaceholderPage label="Edit Event — Phase 12" />} />
+            <Route path="/my-events" element={<PlaceholderPage label="My Events — Phase 13" />} />
+          </Route>
+        </Route>
+
         <Route path="*" element={<PlaceholderPage label="404 Not Found" />} />
       </Routes>
       <Toaster position="top-right" richColors />

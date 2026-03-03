@@ -33,6 +33,13 @@ export function setupAxiosInterceptors(getAuthState: () => AuthAccessor): void {
       const status = error.response?.status;
 
       if (status === 401 && config && !config._isRetrying) {
+
+        const isAuthEndpoint = config.url?.includes('/auth/login') || config.url?.includes('/auth/register');
+
+        if (isAuthEndpoint) {
+            toast.error('Invalid email or password');
+            return Promise.reject(error);
+        }
         config._isRetrying = true;
 
         const refreshToken = localStorage.getItem('refresh_token');
@@ -61,7 +68,7 @@ export function setupAxiosInterceptors(getAuthState: () => AuthAccessor): void {
         }
       }
 
-      if (status && status >= 400 && status !== 401) {
+      if (status && status >= 400) {
         const responseData = error.response?.data as Record<string, unknown> | undefined;
         const message =
           typeof responseData?.message === 'string'
