@@ -6,6 +6,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
 import LoginPage from '@/features/auth/LoginPage';
 import SignUpPage from '@/features/auth/SignUpPage';
+import EventsPage from '@/features/events/EventsPage';
 
 function PlaceholderPage({ label }: { label: string }) {
   return (
@@ -30,7 +31,7 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/events" element={<PlaceholderPage label="Events — Phase 10" />} />
+          <Route path="/events" element={<EventsPage />} />
           <Route path="/events/:id" element={<PlaceholderPage label="Event Details — Phase 11" />} />
 
           <Route element={<ProtectedRoute />}>
