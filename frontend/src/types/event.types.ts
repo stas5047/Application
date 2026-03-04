@@ -11,18 +11,21 @@ export interface EventParticipant {
   email: string;
 }
 
-export interface EventSummaryResponse {
+export interface EventForCta {
   id: string;
+  capacity: number | null;
+  participantCount: number;
+  isJoined: boolean;
+  organizerId: string;
+}
+
+export interface EventSummaryResponse extends EventForCta {
   title: string;
   description: string | null;
   dateTime: string;
   location: string;
-  capacity: number | null;
   visibility: EventVisibility;
-  organizerId: string;
   organizer: EventOrganizer;
-  participantCount: number;
-  isJoined: boolean;
   createdAt: string;
 }
 
