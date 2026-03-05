@@ -124,3 +124,57 @@
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     }
 }
+
+/* ── react-big-calendar theme overrides ────────────────────────── */
+.rbc-toolbar button {
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+.rbc-toolbar button:hover {
+  background: var(--muted);
+}
+.rbc-toolbar button.rbc-active {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+.rbc-event {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+.rbc-event.rbc-selected {
+  background-color: transparent;
+}
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row,
+.rbc-header + .rbc-header,
+.rbc-time-content,
+.rbc-time-header-content,
+.rbc-time-view,
+.rbc-month-view {
+  border-color: var(--border);
+}
+.rbc-off-range-bg {
+  background: var(--muted);
+}
+.rbc-off-range {
+  color: var(--muted-foreground);
+}
+.rbc-month-view,
+.rbc-time-view {
+  border-radius: var(--radius);
+}
+.rbc-show-more {
+  color: var(--primary);
+}
+.rbc-today {
+  background-color: color-mix(in oklch, var(--primary) 8%, transparent);
+}
+
+@media (max-width: 640px) {
+  .rbc-month-view,
+  .rbc-time-view { display: none; }
+  .rbc-agenda-view { display: block; }
+}

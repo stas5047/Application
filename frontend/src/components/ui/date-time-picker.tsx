@@ -17,7 +17,7 @@ export function DateTimePicker({ label, value, onChange, onBlur, error, id }: Da
       {label && <Label htmlFor={id}>{label}</Label>}
       <DatePicker
         selected={value}
-        onChange={(date) => {
+        onChange={(date: Date | null) => {
           onChange(date);
           onBlur();
         }}

@@ -9,6 +9,7 @@ import SignUpPage from '@/features/auth/SignUpPage';
 import EventsPage from '@/features/events/EventsPage';
 import EventDetailsPage from '@/features/events/EventDetailsPage';
 import EventFormPage from '@/features/events/EventFormPage';
+import MyEventsPage from '@/features/my-events/MyEventsPage';
 
 function PlaceholderPage({ label }: { label: string }) {
   return (
@@ -39,7 +40,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/events/create" element={<EventFormPage />} />
             <Route path="/events/:id/edit" element={<EventFormPage />} />
-            <Route path="/my-events" element={<PlaceholderPage label="My Events — Phase 13" />} />
+            <Route path="/my-events" element={<MyEventsPage />} />
           </Route>
         </Route>
 
