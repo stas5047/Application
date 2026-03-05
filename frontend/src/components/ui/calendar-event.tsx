@@ -15,7 +15,7 @@ export function CalendarEvent({ event }: CalendarEventProps) {
         'truncate rounded px-1.5 py-0.5 text-xs font-medium',
         isOrganizer
           ? 'bg-primary text-primary-foreground'
-          : 'bg-indigo-500 text-white',
+          : 'bg-primary/40 text-primary',
       )}
     >
       <span className="mr-1 opacity-80">{format(event.start, 'h:mm')}</span>

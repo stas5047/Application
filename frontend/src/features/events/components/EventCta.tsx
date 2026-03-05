@@ -74,6 +74,7 @@ export function EventCta({
 
   return (
     <Button
+      className="bg-green-500 hover:bg-green-600 text-white border-transparent"
       onClick={(e) => {
         e.stopPropagation();
         onJoin(eventId);

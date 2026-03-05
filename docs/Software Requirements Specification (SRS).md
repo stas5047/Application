@@ -216,17 +216,27 @@ Focus on clarity and immediate usability over decorative elements.
 
 ### Navigation
 - Fixed top bar, full width, white background with border-b
-- Left: logo / brand
-- Right: "Events" link, "My Events" link, "+ Create Event" button (primary), user avatar chip, logout icon
+- Left: brand "EventHub" (`text-primary`), nav links with icons — "Events" (`CalendarDays`), "My Events" (`CalendarRange`)
+- Active nav link: `text-primary`; inactive: `text-muted-foreground`
+- Right: "+ Create Event" button (`bg-primary`), user email, logout icon
 
 ### Component Specifications
 
 #### Event Card
 - White background, rounded-xl, border, shadow-sm
-- Title: text-lg font-semibold
-- Description: text-sm text-secondary, 2-line clamp
+- Hover: `shadow-md`, `border-primary/30`, `-translate-y-px`; title transitions to `text-primary`
+- Title: text-base font-semibold (transitions to `text-primary` on card hover)
+- Description: text-sm text-muted-foreground, 2-line clamp
 - Meta row icons: lucide-react (Calendar, Clock, MapPin, Users)
-- CTA: full-width "Join Event" button (success green) or "Leave Event" (outline) or "Full" (disabled)
+- Participant count: `{count} / {capacity}` when capacity is set; `{count} joined` when unlimited
+- Capacity bar: `<CapacityBar>` component below the Users row — single `bg-green-500` fill; hidden when `capacity === null`
+- CTA: "Join Event" button (`bg-green-500` — **never** `bg-primary`) or "Leave Event" (outline) or "Full" (disabled)
+
+#### CapacityBar (`src/components/ui/capacity-bar.tsx`)
+- Track: `h-1.5 rounded-full bg-muted`
+- Fill: `bg-green-500`, width = `clamp(participantCount / capacity * 100, 0, 100)%`
+- Rendered only when `capacity !== null`
+- ARIA: `role="progressbar"`, `aria-valuenow`, `aria-valuemin=0`, `aria-valuemax=100`, `aria-label`
 
 #### Form (Create/Edit Event)
 - Centered card layout, max-w-lg, rounded-2xl, border, shadow-md
@@ -237,9 +247,9 @@ Focus on clarity and immediate usability over decorative elements.
 - Actions: Cancel (outline) + Submit (primary) in a flex row
 
 #### Calendar (My Events)
-- Month / Week toggle in top-right (active state: primary bg, white text)
-- Month view: 7-column grid, events as primary-colored pills
-- Week view: 7-column day cards, events as indigo pills with time prefix
+- Custom toolbar: `ChevronLeft` (prev), `CalendarCheck` "Today" button, date label centered, `ChevronRight` (next); view toggles (Month / Week / Agenda) on the right; active view: `bg-primary text-white`
+- Organizer event pills: `bg-primary text-primary-foreground` (solid indigo)
+- Participant event pills: `bg-primary/40 text-primary` (40% opacity indigo — same hue, visually distinct)
 - Empty state message centered in the calendar area
 
 #### Modal (Delete Confirmation)
@@ -250,11 +260,11 @@ Focus on clarity and immediate usability over decorative elements.
 
 ### Responsiveness
 - Mobile-first. Every component tested at 375px, 768px, 1280px.
-- Hamburger menu or bottom nav for mobile (if needed).
-- Calendar collapses to list view on mobile if full grid is not readable.
+- Calendar collapses to agenda-only view on mobile (≤640px).
 
 ### Feedback & States
 - Every async action shows a loading spinner on the button.
-- Success: shadcn `<Toast>` (top-right, green variant).
-- Error: shadcn `<Toast>` (top-right, destructive variant).
+- Success: sonner `toast.success()` (top-right).
+- Error: sonner `toast.error()` (top-right).
 - Full event: "Full" label replaces Join button (disabled, gray).
+- Join button is always `bg-green-500` regardless of primary color theme.

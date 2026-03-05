@@ -2,7 +2,8 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { CapacityBar } from '@/components/ui/capacity-bar';
+import { cn } from '@/lib/utils';
 
 interface EventCardProps {
   id: string;
@@ -16,22 +17,6 @@ interface EventCardProps {
   onClick?: () => void;
 }
 
-function CapacityBadge({
-  capacity,
-  participantCount,
-}: {
-  capacity: number | null;
-  participantCount: number;
-}) {
-  if (capacity === null) {
-    return <Badge variant="secondary">Unlimited</Badge>;
-  }
-  if (participantCount >= capacity) {
-    return <Badge variant="destructive">Full</Badge>;
-  }
-  return <Badge variant="secondary">{participantCount}/{capacity}</Badge>;
-}
-
 export function EventCard({
   title,
   description,
@@ -43,17 +28,27 @@ export function EventCard({
   onClick,
 }: EventCardProps) {
   const date = new Date(dateTime);
+  const participantText =
+    capacity !== null ? `${participantCount} / ${capacity}` : `${participantCount} joined`;
 
   return (
     <Card
-      className={onClick ? 'cursor-pointer transition-shadow hover:shadow-md' : undefined}
+      className={cn(
+        'group transition-all',
+        onClick &&
+          'cursor-pointer hover:shadow-md hover:border-primary/30 hover:-translate-y-px',
+      )}
       onClick={onClick}
     >
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base leading-snug">{title}</CardTitle>
-          <CapacityBadge capacity={capacity} participantCount={participantCount} />
-        </div>
+        <CardTitle
+          className={cn(
+            'text-base leading-snug transition-colors',
+            onClick && 'group-hover:text-primary',
+          )}
+        >
+          {title}
+        </CardTitle>
         {description && (
           <p className="text-muted-foreground line-clamp-2 text-sm">{description}</p>
         )}
@@ -73,8 +68,9 @@ export function EventCard({
         </div>
         <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
           <Users className="size-3.5 shrink-0" />
-          <span>{participantCount} joined</span>
+          <span>{participantText}</span>
         </div>
+        <CapacityBar participantCount={participantCount} capacity={capacity} />
       </CardContent>
       <CardFooter>{cta}</CardFooter>
     </Card>

@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft, CalendarDays, MapPin, Pencil, Trash2, Users } f
 import { useAuthStore } from '@/store/auth.store';
 import { useEventDetail } from '@/features/events/hooks/use-event-detail';
 import { EventCta } from '@/features/events/components/EventCta';
+import { CapacityBar } from '@/components/ui/capacity-bar';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import { ParticipantList } from '@/components/ui/participant-list';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -135,6 +136,7 @@ export default function EventDetailsPage() {
                 <Users className="text-muted-foreground size-4 shrink-0" />
                 <span>{capacityText}</span>
               </div>
+              <CapacityBar participantCount={event.participantCount} capacity={event.capacity} />
               {event.description && (
                 <p className="text-muted-foreground border-border mt-4 border-t pt-4 text-sm leading-relaxed">
                   {event.description}

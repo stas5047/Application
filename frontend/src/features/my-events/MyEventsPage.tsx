@@ -1,14 +1,15 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import type { View, EventProps } from 'react-big-calendar';
+import type { View, EventProps, ToolbarProps } from 'react-big-calendar';
 import { format, parse, getDay, startOfWeek } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
-import { CalendarDays } from 'lucide-react';
+import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarEvent } from '@/components/ui/calendar-event';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { CalendarEventItem } from '@/types/calendar.types';
 import { useMyEvents } from './use-my-events';
 
@@ -24,6 +25,60 @@ const localizer = dateFnsLocalizer({
 // Module-scope wrapper so react-big-calendar does not re-mount events on parent re-renders
 function CalendarEventWrapper({ event }: EventProps<CalendarEventItem>) {
   return <CalendarEvent event={event} />;
+}
+
+// ADR-F017: defined at module scope — stable reference required by react-big-calendar
+const VIEWS: View[] = ['month', 'week', 'agenda'];
+const VIEW_LABELS: Record<string, string> = { month: 'Month', week: 'Week', agenda: 'Agenda' };
+
+function CalendarToolbar({ label, view, views, onNavigate, onView }: ToolbarProps<CalendarEventItem>) {
+  return (
+    <div className="flex items-center justify-between px-1 pb-3">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onNavigate('PREV')}
+          className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Previous"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onNavigate('TODAY')}
+          className="flex items-center gap-1 px-2 py-1.5 rounded text-sm font-medium hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Today"
+        >
+          <CalendarCheck className="h-4 w-4" />
+          Today
+        </button>
+        <button
+          onClick={() => onNavigate('NEXT')}
+          className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Next"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+
+      <span className="text-sm font-semibold">{label}</span>
+
+      <div className="flex items-center gap-1">
+        {(Array.isArray(views) ? views : VIEWS).map((v) => (
+          <button
+            key={v}
+            onClick={() => onView(v)}
+            className={cn(
+              'text-xs font-medium px-3 py-1.5 rounded transition-colors',
+              view === v
+                ? 'bg-primary text-primary-foreground'
+                : 'border border-border text-muted-foreground hover:bg-muted',
+            )}
+          >
+            {VIEW_LABELS[v] ?? v}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function MyEventsPage() {
@@ -95,7 +150,7 @@ export default function MyEventsPage() {
         onNavigate={setDate}
         views={isMobile ? ['agenda'] : ['month', 'week', 'agenda']}
         onSelectEvent={handleSelectEvent}
-        components={{ event: CalendarEventWrapper }}
+        components={{ toolbar: CalendarToolbar, event: CalendarEventWrapper }}
         style={{ height: 'calc(100vh - 220px)', minHeight: 500 }}
         culture="en-US"
         titleAccessor="title"
