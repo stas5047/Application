@@ -46,7 +46,7 @@ export default function App() {
 
         <Route path="*" element={<PlaceholderPage label="404 Not Found" />} />
       </Routes>
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right" richColors duration={1500} />
     </>
   );
 }

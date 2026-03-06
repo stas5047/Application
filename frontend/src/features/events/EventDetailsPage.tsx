@@ -150,6 +150,7 @@ export default function EventDetailsPage() {
               isJoined={event.isJoined}
               isAuthenticated={isAuthenticated}
               isInFlight={isInFlight}
+              isOrganizer={isOrganizer}
               onJoin={() => void handleJoin()}
               onLeave={() => void handleLeave()}
             />

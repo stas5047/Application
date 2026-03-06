@@ -173,6 +173,16 @@
   background-color: color-mix(in oklch, var(--primary) 8%, transparent);
 }
 
+/* Agenda view: consistent divider between Date and Time columns on every row */
+.rbc-agenda-time-cell {
+  border-left: 1px solid var(--border);
+}
+
+/* Agenda view: pointer cursor on event rows */
+.rbc-agenda-table tbody tr {
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .rbc-month-view,
   .rbc-time-view { display: none; }

@@ -15,6 +15,7 @@ export default function EventsPage() {
     useEventActions();
   const events = useEventsStore((s) => s.events);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const userId = useAuthStore((s) => s.user?.id);
 
   if (isLoading && events.length === 0) {
     return (
@@ -65,6 +66,7 @@ export default function EventsPage() {
             location={e.location}
             capacity={e.capacity}
             participantCount={e.participantCount}
+            isOrganizer={!!userId && e.organizerId === userId}
             onClick={() => void navigate(`/events/${e.id}`)}
             cta={
               <EventCta
@@ -74,6 +76,7 @@ export default function EventsPage() {
                 isJoined={e.isJoined}
                 isAuthenticated={isAuthenticated}
                 isInFlight={loadingIds.has(e.id)}
+                isOrganizer={!!userId && e.organizerId === userId}
                 onJoin={(id) => void handleJoin(id)}
                 onLeave={(id) => void handleLeave(id)}
               />

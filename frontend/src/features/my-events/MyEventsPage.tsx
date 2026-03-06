@@ -110,6 +110,11 @@ export default function MyEventsPage() {
     [navigate],
   );
 
+  const handleShowMore = useCallback((_events: CalendarEventItem[], date: Date) => {
+    setDate(date);
+    setView('week');
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -150,6 +155,7 @@ export default function MyEventsPage() {
         onNavigate={setDate}
         views={isMobile ? ['agenda'] : ['month', 'week', 'agenda']}
         onSelectEvent={handleSelectEvent}
+        onShowMore={handleShowMore}
         components={{ toolbar: CalendarToolbar, event: CalendarEventWrapper }}
         style={{ height: 'calc(100vh - 220px)', minHeight: 500 }}
         culture="en-US"

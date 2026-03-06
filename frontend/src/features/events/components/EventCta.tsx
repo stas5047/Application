@@ -9,6 +9,7 @@ interface EventCtaProps {
   isJoined: boolean;
   isAuthenticated: boolean;
   isInFlight: boolean;
+  isOrganizer?: boolean;
   onJoin: (id: string) => void;
   onLeave: (id: string) => void;
 }
@@ -20,6 +21,7 @@ export function EventCta({
   isJoined,
   isAuthenticated,
   isInFlight,
+  isOrganizer,
   onJoin,
   onLeave,
 }: EventCtaProps) {
@@ -59,6 +61,7 @@ export function EventCta({
   }
 
   if (isJoined) {
+    if (isOrganizer) return null;
     return (
       <Button
         variant="outline"

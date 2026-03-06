@@ -13,6 +13,7 @@ interface EventCardProps {
   location: string;
   capacity: number | null;
   participantCount: number;
+  isOrganizer?: boolean;
   cta: React.ReactNode;
   onClick?: () => void;
 }
@@ -24,6 +25,7 @@ export function EventCard({
   location,
   capacity,
   participantCount,
+  isOrganizer,
   cta,
   onClick,
 }: EventCardProps) {
@@ -34,21 +36,28 @@ export function EventCard({
   return (
     <Card
       className={cn(
-        'group transition-all',
+        'group flex flex-col transition-all',
         onClick &&
           'cursor-pointer hover:shadow-md hover:border-primary/30 hover:-translate-y-px',
       )}
       onClick={onClick}
     >
       <CardHeader className="pb-2">
-        <CardTitle
-          className={cn(
-            'text-base leading-snug transition-colors',
-            onClick && 'group-hover:text-primary',
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle
+            className={cn(
+              'text-base leading-snug transition-colors',
+              onClick && 'group-hover:text-primary',
+            )}
+          >
+            {title}
+          </CardTitle>
+          {isOrganizer && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+              Mine
+            </span>
           )}
-        >
-          {title}
-        </CardTitle>
+        </div>
         {description && (
           <p className="text-muted-foreground line-clamp-2 text-sm">{description}</p>
         )}
@@ -72,7 +81,7 @@ export function EventCard({
         </div>
         <CapacityBar participantCount={participantCount} capacity={capacity} />
       </CardContent>
-      <CardFooter>{cta}</CardFooter>
+      <CardFooter className="mt-auto">{cta}</CardFooter>
     </Card>
   );
 }
