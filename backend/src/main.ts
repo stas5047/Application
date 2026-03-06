@@ -12,7 +12,7 @@ async function bootstrap(): Promise<void> {
 
   const configService = app.get(ConfigService);
   app.enableCors({
-    origin: configService.get<string>('FRONTEND_ORIGIN') ?? '*',
+    origin: configService.getOrThrow<string>('FRONTEND_ORIGIN'),
     credentials: true,
   });
 
