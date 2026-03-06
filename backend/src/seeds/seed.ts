@@ -166,18 +166,18 @@ async function seed(): Promise<void> {
   ] = savedEvents;
 
   // --- Participants ---
-  // Format: [event, [...users to add]]
+  // Format: [event, [...users to add]] — organizer is always first to mirror EventsService.create() behaviour
   const participations: [Event, User[]][] = [
-    [evTypescript,  [bob, carol, dan, eve]],          // past, full-ish (4/30)
-    [evDocker,      [alice, carol, dan]],              // past (3/20)
-    [evNest,        [bob, carol, dan, eve]],           // current (4/50)
-    [evUx,          [alice, bob, dan, eve]],              // current (4/15)
-    [evRetro,       [alice, carol]],                   // private (3/10 incl. organizer)
-    [evReact,       [bob, carol, eve]],                // future (3/40)
-    [evNetworking,  [alice, bob, carol, dan]],         // future, unlimited
-    [evPg,          [alice, carol, eve]],              // future (3/60)
-    [evCicd,        [alice, bob, eve]],                // future (3/100)
-    [evDemo,        [alice, bob, carol, dan]],         // future (4/200)
+    [evTypescript,  [alice, bob, carol, dan, eve]],   // alice = organizer (5/30)
+    [evDocker,      [bob, alice, carol, dan]],         // bob   = organizer (4/20)
+    [evNest,        [alice, bob, carol, dan, eve]],   // alice = organizer (5/50)
+    [evUx,          [carol, alice, bob, dan, eve]],   // carol = organizer (5/15)
+    [evRetro,       [dan, alice, carol]],              // dan   = organizer (3/10, private)
+    [evReact,       [alice, bob, carol, eve]],         // alice = organizer (4/40)
+    [evNetworking,  [eve, alice, bob, carol, dan]],   // eve   = organizer (5/unlimited)
+    [evPg,          [bob, alice, carol, eve]],         // bob   = organizer (4/60)
+    [evCicd,        [dan, alice, bob, eve]],           // dan   = organizer (4/100)
+    [evDemo,        [eve, alice, bob, carol, dan]],   // eve   = organizer (5/200)
   ];
 
   for (const [event, users] of participations) {

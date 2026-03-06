@@ -6,7 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import type { Event } from '../../events/entities/event.entity';
+import { Event } from '../../events/entities/event.entity';
 
 @Entity('users')
 export class User {
@@ -28,9 +28,9 @@ export class User {
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 
-  @OneToMany('Event', 'organizer')
+  @OneToMany(() => Event, (event) => event.organizer)
   organizedEvents!: Event[];
 
-  @ManyToMany('Event', 'participants')
+  @ManyToMany(() => Event, (event) => event.participants)
   participatedEvents!: Event[];
 }

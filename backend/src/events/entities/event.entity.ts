@@ -1,4 +1,5 @@
 import {
+  Check,
   Column,
   CreateDateColumn,
   Entity,
@@ -50,9 +51,7 @@ export class Event {
   @Column({ type: 'uuid' })
   organizerId!: string;
 
-  @ManyToMany(() => User, (user) => user.participatedEvents, {
-    cascade: ['insert'],
-  })
+  @ManyToMany(() => User, (user) => user.participatedEvents)
   @JoinTable({
     name: 'event_participants',
     joinColumn: { name: 'event_id', referencedColumnName: 'id' },
