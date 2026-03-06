@@ -21,16 +21,20 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(email: string, password: string): Promise<AuthResponseDto> {
-    const existing = await this.usersService.findByEmail(email);
-    if (existing) {
+  async register(email: string, username: string, password: string): Promise<AuthResponseDto> {
+    const existingEmail = await this.usersService.findByEmail(email);
+    if (existingEmail) {
       throw new ConflictException('Email already in use');
     }
+    const existingUsername = await this.usersService.findByUsername(username);
+    if (existingUsername) {
+      throw new ConflictException('Username already in use');
+    }
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
-    const user = await this.usersService.create(email, passwordHash);
-    const tokens = this.issueTokenPair(user.id, user.email);
+    const user = await this.usersService.create(email, username, passwordHash);
+    const tokens = this.issueTokenPair(user.id, user.username);
     await this.storeRefreshTokenHash(user.id, tokens.refreshToken);
-    return { ...tokens, user: { id: user.id, email: user.email } };
+    return { ...tokens, user: { id: user.id, username: user.username } };
   }
 
   async login(email: string, password: string): Promise<AuthResponseDto> {
@@ -42,9 +46,9 @@ export class AuthService {
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const tokens = this.issueTokenPair(user.id, user.email);
+    const tokens = this.issueTokenPair(user.id, user.username);
     await this.storeRefreshTokenHash(user.id, tokens.refreshToken);
-    return { ...tokens, user: { id: user.id, email: user.email } };
+    return { ...tokens, user: { id: user.id, username: user.username } };
   }
 
   async refresh(rawToken: string): Promise<AuthResponseDto> {
@@ -64,9 +68,9 @@ export class AuthService {
     if (!tokenMatch) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
-    const tokens = this.issueTokenPair(user.id, user.email);
+    const tokens = this.issueTokenPair(user.id, user.username);
     await this.storeRefreshTokenHash(user.id, tokens.refreshToken);
-    return { ...tokens, user: { id: user.id, email: user.email } };
+    return { ...tokens, user: { id: user.id, username: user.username } };
   }
 
   async logout(userId: string): Promise<void> {
@@ -75,9 +79,9 @@ export class AuthService {
 
   private issueTokenPair(
     userId: string,
-    email: string,
+    username: string,
   ): { accessToken: string; refreshToken: string } {
-    const payload: JwtPayload = { sub: userId, email };
+    const payload: JwtPayload = { sub: userId, username };
     const accessToken = this.jwtService.sign(payload);
     const refreshSignOptions: JwtSignOptions = {
       secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),

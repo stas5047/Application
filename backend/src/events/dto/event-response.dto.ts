@@ -6,7 +6,7 @@ export class EventOrganizerDto {
   id!: string;
 
   @ApiProperty()
-  email!: string;
+  username!: string;
 }
 
 export class EventParticipantDto {
@@ -14,7 +14,7 @@ export class EventParticipantDto {
   id!: string;
 
   @ApiProperty()
-  email!: string;
+  username!: string;
 }
 
 export class EventSummaryResponseDto {

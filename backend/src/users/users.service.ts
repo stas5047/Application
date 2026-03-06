@@ -22,9 +22,14 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
-  async create(email: string, passwordHash: string): Promise<User> {
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ username });
+  }
+
+  async create(email: string, username: string, passwordHash: string): Promise<User> {
     const user = this.userRepository.create({
       email,
+      username,
       passwordHash,
       refreshTokenHash: null,
     });

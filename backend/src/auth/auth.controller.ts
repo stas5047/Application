@@ -39,10 +39,10 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: 'Register a new user account' })
   @ApiCreatedResponse({ type: AuthResponseDto })
-  @ApiConflictResponse({ description: 'Email already in use' })
+  @ApiConflictResponse({ description: 'Email or username already in use' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
   register(@Body() dto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(dto.email, dto.password);
+    return this.authService.register(dto.email, dto.username, dto.password);
   }
 
   @Post('login')

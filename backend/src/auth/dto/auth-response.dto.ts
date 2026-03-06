@@ -5,7 +5,7 @@ export class UserPayloadDto {
   id!: string;
 
   @ApiProperty()
-  email!: string;
+  username!: string;
 }
 
 export class AuthResponseDto {

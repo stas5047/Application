@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { CalendarDays, CalendarRange, LogOut, Menu, X } from 'lucide-react';
+import { CalendarDays, CalendarRange, LogOut, Menu, User, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
@@ -76,7 +76,10 @@ export default function Navbar() {
               <Button asChild size="sm">
                 <Link to="/events/create">+ Create Event</Link>
               </Button>
-              <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                {user?.username}
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -149,7 +152,10 @@ export default function Navbar() {
             + Create Event
           </Link>
           <div className="pt-1 border-t flex items-center justify-between">
-            <span className="text-sm text-muted-foreground truncate max-w-[200px]">{user?.email}</span>
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground truncate max-w-[200px]">
+              <User className="h-4 w-4 shrink-0" />
+              {user?.username}
+            </span>
             <button
               onClick={() => void handleLogout()}
               className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"

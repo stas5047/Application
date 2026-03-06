@@ -81,7 +81,7 @@ export class EventsService {
       capacity: event.capacity,
       visibility: event.visibility,
       organizerId: event.organizerId,
-      organizer: { id: event.organizer.id, email: event.organizer.email },
+      organizer: { id: event.organizer.id, username: event.organizer.username },
       participantCount: event.participantCount,
       isJoined: userId ? joinedSet.has(event.id) : false,
       createdAt: event.createdAt,
@@ -107,13 +107,13 @@ export class EventsService {
       capacity: event.capacity,
       visibility: event.visibility,
       organizerId: event.organizerId,
-      organizer: { id: event.organizer.id, email: event.organizer.email },
+      organizer: { id: event.organizer.id, username: event.organizer.username },
       participantCount: event.participants.length,
       isJoined,
       createdAt: event.createdAt,
       participants: event.participants.map((p) => ({
         id: p.id,
-        email: p.email,
+        username: p.username,
       })),
     };
   }

@@ -1,6 +1,6 @@
 export interface UserPayload {
   id: string;
-  email: string;
+  username: string;
 }
 
 export interface AuthResponse {
@@ -11,6 +11,7 @@ export interface AuthResponse {
 
 export interface RegisterRequest {
   email: string;
+  username: string;
   password: string;
 }
 
