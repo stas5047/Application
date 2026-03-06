@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import type { View, EventProps, ToolbarProps } from 'react-big-calendar';
 import { format, parse, getDay, startOfWeek } from 'date-fns';
-import { enUS } from 'date-fns/locale/en-US';
+import { enGB } from 'date-fns/locale/en-GB';
 import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarEvent } from '@/components/ui/calendar-event';
@@ -19,7 +19,7 @@ const localizer = dateFnsLocalizer({
   parse,
   startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
   getDay,
-  locales: { 'en-US': enUS },
+  locales: { 'en-GB': enGB },
 });
 
 // Module-scope wrapper so react-big-calendar does not re-mount events on parent re-renders
@@ -168,10 +168,15 @@ export default function MyEventsPage() {
         onShowMore={handleShowMore}
         components={{ toolbar: CalendarToolbar, event: CalendarEventWrapper }}
         style={{ height: 'calc(100vh - 220px)', minHeight: 500 }}
-        culture="en-US"
+        culture="en-GB"
         titleAccessor="title"
         startAccessor="start"
         endAccessor="end"
+        formats={{
+          agendaDateFormat: 'dd/MM/yyyy',
+          dayFormat: 'dd/MM/yyyy',
+          dateFormat: 'dd',
+        }}
       />
       </div>
     </div>

@@ -110,7 +110,7 @@
     --sidebar-primary: oklch(0.488 0.243 264.376);
     --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
     --sidebar-accent: oklch(0.279 0.041 260.031);
-    --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+    --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.551 0.027 264.364);
 }
@@ -171,6 +171,45 @@
 }
 .rbc-today {
   background-color: color-mix(in oklch, var(--primary) 8%, transparent);
+}
+
+/* Agenda view: scroll header + body as a single unit */
+.rbc-agenda-view {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fixed table layout so header and data columns always align */
+.rbc-agenda-view > table,
+.rbc-agenda-table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 480px;
+}
+
+/* Date column: fixed width */
+.rbc-agenda-table thead > tr > th:first-child,
+.rbc-agenda-date-cell {
+  width: 110px;
+}
+
+/* Time column: fixed width */
+.rbc-agenda-table thead > tr > th:nth-child(2),
+.rbc-agenda-time-cell {
+  width: 150px;
+}
+
+/* Event column: fills remaining space */
+.rbc-agenda-table thead > tr > th:nth-child(3),
+.rbc-agenda-event-cell {
+  width: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Prevent the inner empty/no-events container from breaking scroll */
+.rbc-agenda-empty {
+  min-width: 480px;
 }
 
 /* Agenda view: consistent divider between Date and Time columns on every row */

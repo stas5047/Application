@@ -22,10 +22,10 @@ export function DateTimePicker({ label, value, onChange, onBlur, error, id }: Da
         onBlur={onBlur}
         showTimeSelect
         timeIntervals={15}
-        dateFormat="MMM d, yyyy h:mm aa"
+        dateFormat="dd/MM/yyyy h:mm aa"
         minDate={new Date()}
         wrapperClassName="w-full"
-        popperPlacement="bottom-start"
+        popperPlacement="bottom"
         customInput={
           <Input
             id={id}
