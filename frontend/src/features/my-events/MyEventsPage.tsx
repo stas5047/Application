@@ -30,6 +30,11 @@ function CalendarEventWrapper({ event }: EventProps<CalendarEventItem>) {
 // ADR-F017: defined at module scope — stable reference required by react-big-calendar
 const VIEWS: View[] = ['month', 'week', 'agenda'];
 const VIEW_LABELS: Record<string, string> = { month: 'Month', week: 'Week', agenda: 'Agenda' };
+const TODAY_LABEL: Record<string, string> = {
+  month: 'This Month',
+  week: 'This Week',
+  agenda: 'Next 30 Days',
+};
 
 function CalendarToolbar({ label, view, views, onNavigate, onView }: ToolbarProps<CalendarEventItem>) {
   return (
@@ -48,7 +53,7 @@ function CalendarToolbar({ label, view, views, onNavigate, onView }: ToolbarProp
           aria-label="Today"
         >
           <CalendarCheck className="h-4 w-4" />
-          Today
+          {TODAY_LABEL[view] ?? 'Today'}
         </button>
         <button
           onClick={() => onNavigate('NEXT')}
@@ -145,7 +150,12 @@ export default function MyEventsPage() {
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+    <div className="py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold">My Events</h1>
+        <p className="mt-1 text-sm text-muted-foreground">View and manage your event calendar</p>
+      </div>
+      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
       <Calendar<CalendarEventItem>
         localizer={localizer}
         events={calendarEvents}
@@ -163,6 +173,7 @@ export default function MyEventsPage() {
         startAccessor="start"
         endAccessor="end"
       />
+      </div>
     </div>
   );
 }

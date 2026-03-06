@@ -183,6 +183,11 @@
   cursor: pointer;
 }
 
+/* Week view: hide the time label inside event blocks */
+.rbc-event-label {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .rbc-month-view,
   .rbc-time-view { display: none; }

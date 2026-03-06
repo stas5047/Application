@@ -42,7 +42,7 @@ export default function EventFormPage() {
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
           {/* Title */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
             <Input
               id="title"
               placeholder="Give your event a clear title"
@@ -80,7 +80,7 @@ export default function EventFormPage() {
             render={({ field }) => (
               <DateTimePicker
                 id="dateTime"
-                label="Date & Time"
+                label={<>Date & Time <span className="text-destructive">*</span></>}
                 value={field.value ?? null}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
@@ -91,7 +91,7 @@ export default function EventFormPage() {
 
           {/* Location */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">Location <span className="text-destructive">*</span></Label>
             <Input
               id="location"
               placeholder="City, venue, or online link"
