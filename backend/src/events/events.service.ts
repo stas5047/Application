@@ -27,15 +27,6 @@ export class EventsService {
       throw new BadRequestException('dateTime must be in the future');
   }
 
-  private assertEventVisible(event: Event, userId?: string): void {
-    if (
-      event.visibility === EventVisibility.PRIVATE &&
-      userId !== event.organizerId &&
-      !event.participants.some((p) => p.id === userId)
-    )
-      throw new NotFoundException('Event not found');
-  }
-
   private async findEventOrFail(id: string): Promise<Event> {
     const event = await this.repo.findOneBy({ id });
     if (!event) throw new NotFoundException('Event not found');
@@ -94,7 +85,6 @@ export class EventsService {
       relations: { organizer: true, participants: true },
     });
     if (!event) throw new NotFoundException('Event not found');
-    this.assertEventVisible(event, userId);
     const isJoined = userId
       ? event.participants.some((p) => p.id === userId)
       : false;
@@ -167,7 +157,6 @@ export class EventsService {
 
   async join(id: string, userId: string): Promise<EventDetailResponseDto> {
     const event = await this.findWithParticipantsOrFail(id);
-    this.assertEventVisible(event, userId);
     if (event.participants.some((p) => p.id === userId))
       throw new ConflictException('You have already joined this event');
     if (event.capacity !== null && event.participants.length >= event.capacity)
@@ -182,7 +171,6 @@ export class EventsService {
 
   async leave(id: string, userId: string): Promise<EventDetailResponseDto> {
     const event = await this.findWithParticipantsOrFail(id);
-    this.assertEventVisible(event, userId);
     if (event.organizerId === userId)
       throw new BadRequestException('Organizer cannot leave their own event');
     if (!event.participants.some((p) => p.id === userId))
