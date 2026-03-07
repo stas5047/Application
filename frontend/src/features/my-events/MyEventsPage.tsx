@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import type { View, EventProps, ToolbarProps } from 'react-big-calendar';
-import { format, parse, getDay, startOfWeek } from 'date-fns';
+import { format, parse, getDay, startOfWeek, startOfMonth, startOfDay, isAfter } from 'date-fns';
 import { enGB } from 'date-fns/locale/en-GB';
 import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -36,13 +36,30 @@ const TODAY_LABEL: Record<string, string> = {
   agenda: 'Next 30 Days',
 };
 
-function CalendarToolbar({ label, view, views, onNavigate, onView }: ToolbarProps<CalendarEventItem>) {
+function CalendarToolbar({ label, view, views, date, onNavigate, onView }: ToolbarProps<CalendarEventItem>) {
+  const today = new Date();
+  let isPrevDisabled: boolean;
+  if (view === 'month') {
+    isPrevDisabled = !isAfter(startOfMonth(date), startOfMonth(today));
+  } else if (view === 'week') {
+    isPrevDisabled = !isAfter(startOfWeek(date, { weekStartsOn: 1 }), startOfWeek(today, { weekStartsOn: 1 }));
+  } else {
+    isPrevDisabled = !isAfter(startOfDay(date), startOfDay(today));
+  }
+
   return (
     <div className="flex items-center justify-between px-1 pb-3">
       <div className="flex items-center gap-1">
         <button
-          onClick={() => onNavigate('PREV')}
-          className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => { if (!isPrevDisabled) onNavigate('PREV'); }}
+          disabled={isPrevDisabled}
+          aria-disabled={isPrevDisabled}
+          className={cn(
+            'p-1.5 rounded transition-colors',
+            isPrevDisabled
+              ? 'cursor-not-allowed opacity-40 text-muted-foreground'
+              : 'hover:bg-muted text-muted-foreground hover:text-foreground',
+          )}
           aria-label="Previous"
         >
           <ChevronLeft className="h-4 w-4" />
