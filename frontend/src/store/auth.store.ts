@@ -20,7 +20,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   isHydrated: false,
 
   login: (data: AuthResponse) => {
-    localStorage.setItem('refresh_token', data.refreshToken);
     set({
       user: data.user,
       accessToken: data.accessToken,
@@ -29,13 +28,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    const refreshToken = localStorage.getItem('refresh_token');
-    if (refreshToken) {
-      void authService.logout(refreshToken).catch(() => {
-        // best-effort logout
-      });
-    }
-    localStorage.removeItem('refresh_token');
     set({ user: null, accessToken: null, isAuthenticated: false });
   },
 
@@ -45,21 +37,16 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   hydrate: async () => {
     set({ isHydrated: false });
-    const refreshToken = localStorage.getItem('refresh_token');
 
-    if (refreshToken) {
-      try {
-        const data = await authService.refresh({ refreshToken });
-        set({
-          accessToken: data.accessToken,
-          user: data.user,
-          isAuthenticated: true,
-        });
-        localStorage.setItem('refresh_token', data.refreshToken);
-      } catch {
-        localStorage.removeItem('refresh_token');
-        set({ user: null, accessToken: null, isAuthenticated: false });
-      }
+    try {
+      const data = await authService.refresh();
+      set({
+        accessToken: data.accessToken,
+        user: data.user,
+        isAuthenticated: true,
+      });
+    } catch {
+      set({ user: null, accessToken: null, isAuthenticated: false });
     }
 
     set({ isHydrated: true });

@@ -107,7 +107,7 @@ describe('EventsService', () => {
     );
   });
 
-  it('findOne: throws NotFoundException for private event when user is not organizer or participant', async () => {
+  it('findOne: returns private event to any user (private = hidden from list, not access-restricted)', async () => {
     const event = buildEvent({
       visibility: EventVisibility.PRIVATE,
       organizerId: 'organizer-uuid',
@@ -116,7 +116,7 @@ describe('EventsService', () => {
     mockRepo.findOne.mockResolvedValue(event);
     await expect(
       service.findOne('event-uuid', 'stranger-uuid'),
-    ).rejects.toThrow(NotFoundException);
+    ).resolves.toBeDefined();
   });
 
   // --- create ---
@@ -198,16 +198,29 @@ describe('EventsService', () => {
 
   // --- join ---
 
-  it('join: throws NotFoundException for private event when user is not organizer or participant', async () => {
+  it('join: allows any user to join a private event via direct link', async () => {
     const event = buildEvent({
       visibility: EventVisibility.PRIVATE,
       organizerId: 'organizer-uuid',
       participants: [],
     });
-    mockRepo.findOne.mockResolvedValue(event);
-    await expect(service.join('event-uuid', 'stranger-uuid')).rejects.toThrow(
-      NotFoundException,
-    );
+    const fullEvent = buildEvent({
+      visibility: EventVisibility.PRIVATE,
+      organizer: buildUser('organizer-uuid', 'org@example.com'),
+      participants: [buildUser('stranger-uuid', 's@s.com')],
+    });
+
+    mockRepo.findOne
+      .mockResolvedValueOnce(event)
+      .mockResolvedValueOnce(fullEvent);
+
+    const relQb = makeRelationQb();
+    mockRepo.createQueryBuilder.mockReturnValue({
+      relation: jest.fn().mockReturnValue(relQb),
+    });
+
+    await service.join('event-uuid', 'stranger-uuid');
+    expect(relQb.add).toHaveBeenCalledWith('stranger-uuid');
   });
 
   it('join: throws ConflictException when user already joined', async () => {

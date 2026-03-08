@@ -19,13 +19,11 @@ export default function Navbar() {
   const handleLogout = async () => {
     closeMenu();
     try {
-      await authService.logout(localStorage.getItem('refresh_token') ?? '');
-      localStorage.removeItem('refresh_token');
+      await authService.logout();
       storeLogout();
       navigate('/login', { replace: true });
     } catch {
       toast.error('Logout failed');
-      localStorage.removeItem('refresh_token');
       storeLogout();
       navigate('/login', { replace: true });
     }

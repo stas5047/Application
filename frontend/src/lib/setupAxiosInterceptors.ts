@@ -35,27 +35,26 @@ export function setupAxiosInterceptors(getAuthState: () => AuthAccessor): void {
       if (status === 401 && config && !config._isRetrying) {
 
         const isAuthEndpoint = config.url?.includes('/auth/login') || config.url?.includes('/auth/register');
+        const isRefreshEndpoint = config.url?.includes('/auth/refresh');
 
         if (isAuthEndpoint) {
             toast.error('Invalid email or password');
             return Promise.reject(error);
         }
-        config._isRetrying = true;
-
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (!refreshToken) {
-          getAuthState().logout();
-          return Promise.reject(error);
+        if (isRefreshEndpoint) {
+            return Promise.reject(error);
         }
+
+        config._isRetrying = true;
 
         try {
           const { data } = await axios.post<AuthResponse>(
             `${apiClient.defaults.baseURL}/auth/refresh`,
-            { refreshToken },
+            {},
+            { withCredentials: true },
           );
 
           getAuthState().setAccessToken(data.accessToken);
-          localStorage.setItem('refresh_token', data.refreshToken);
 
           if (config.headers) {
             config.headers.Authorization = `Bearer ${data.accessToken}`;

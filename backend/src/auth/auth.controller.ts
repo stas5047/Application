@@ -5,6 +5,8 @@ import {
   HttpStatus,
   Post,
   Req,
+  Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -18,18 +20,27 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Request as ExpressRequest } from 'express';
+import { Request, Response } from 'express';
+import type { CookieOptions } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import type { AuthenticatedUser } from './strategies/jwt.strategy';
 
-interface RequestWithUser extends ExpressRequest {
+interface RequestWithUser extends Request {
   user: AuthenticatedUser;
 }
+
+const REFRESH_COOKIE_NAME = 'refresh_token';
+const REFRESH_COOKIE_OPTIONS: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.COOKIE_SECURE === 'true',
+  sameSite: 'lax',
+  path: '/api/auth',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -41,8 +52,17 @@ export class AuthController {
   @ApiCreatedResponse({ type: AuthResponseDto })
   @ApiConflictResponse({ description: 'Email or username already in use' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  register(@Body() dto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(dto.email, dto.username, dto.password);
+  async register(
+    @Body() dto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponseDto> {
+    const { refreshToken, ...body } = await this.authService.register(
+      dto.email,
+      dto.username,
+      dto.password,
+    );
+    res.cookie(REFRESH_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
+    return body;
   }
 
   @Post('login')
@@ -51,18 +71,36 @@ export class AuthController {
   @ApiOkResponse({ type: AuthResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(dto.email, dto.password);
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponseDto> {
+    const { refreshToken, ...body } = await this.authService.login(
+      dto.email,
+      dto.password,
+    );
+    res.cookie(REFRESH_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
+    return body;
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Refresh access token using a valid refresh token' })
+  @ApiOperation({
+    summary: 'Refresh access token using httpOnly cookie',
+  })
   @ApiOkResponse({ type: AuthResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
-  @ApiBadRequestResponse({ description: 'Validation failed' })
-  refresh(@Body() dto: RefreshTokenDto): Promise<AuthResponseDto> {
-    return this.authService.refresh(dto.refreshToken);
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponseDto> {
+    const token = req.cookies?.[REFRESH_COOKIE_NAME] as string | undefined;
+    if (!token) {
+      throw new UnauthorizedException('Missing refresh token');
+    }
+    const { refreshToken, ...body } = await this.authService.refresh(token);
+    res.cookie(REFRESH_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
+    return body;
   }
 
   @Post('logout')
@@ -72,7 +110,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout and invalidate the refresh token' })
   @ApiNoContentResponse({ description: 'Logged out successfully' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
-  async logout(@Req() req: RequestWithUser): Promise<void> {
+  async logout(
+    @Req() req: RequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
     await this.authService.logout(req.user.id);
+    res.clearCookie(REFRESH_COOKIE_NAME, { path: '/api/auth' });
   }
 }

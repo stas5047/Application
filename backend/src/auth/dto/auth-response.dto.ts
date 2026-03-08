@@ -12,9 +12,6 @@ export class AuthResponseDto {
   @ApiProperty()
   accessToken!: string;
 
-  @ApiProperty()
-  refreshToken!: string;
-
   @ApiProperty({ type: UserPayloadDto })
   user!: UserPayloadDto;
 }
