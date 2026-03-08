@@ -18,7 +18,7 @@ export function CalendarEvent({ event }: CalendarEventProps) {
           : 'bg-primary/40 text-primary',
       )}
     >
-      <span className="mr-1 opacity-80">{format(event.start, 'h:mm')}</span>
+      <span className="mr-1 opacity-80">{format(event.start, 'h:mm a')}</span>
       <span className="truncate">{event.title}</span>
     </div>
   );

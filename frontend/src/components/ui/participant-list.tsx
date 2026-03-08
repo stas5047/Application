@@ -6,8 +6,8 @@ interface ParticipantListProps {
   maxVisible?: number;
 }
 
-function getInitials(email: string): string {
-  return email.split('@')[0].slice(0, 2).toUpperCase();
+function getInitials(username: string): string {
+  return username.slice(0, 2).toUpperCase();
 }
 
 const avatarColors = [
@@ -21,8 +21,8 @@ const avatarColors = [
   'bg-red-500',
 ] as const;
 
-function getAvatarColor(email: string): string {
-  const index = email.charCodeAt(0) % avatarColors.length;
+function getAvatarColor(username: string): string {
+  const index = username.charCodeAt(0) % avatarColors.length;
   return avatarColors[index];
 }
 
@@ -39,13 +39,13 @@ export function ParticipantList({ participants, maxVisible = 12 }: ParticipantLi
       {visible.map((participant) => (
         <div
           key={participant.id}
-          title={participant.email}
+          title={participant.username}
           className={cn(
             'flex size-9 items-center justify-center rounded-full text-xs font-semibold text-white',
-            getAvatarColor(participant.email),
+            getAvatarColor(participant.username),
           )}
         >
-          {getInitials(participant.email)}
+          {getInitials(participant.username)}
         </div>
       ))}
       {overflow > 0 && (

@@ -12,8 +12,11 @@ async function seed(): Promise<void> {
 
   // --- Users ---
   const usersData = [
-    { email: 'user1@example.com', password: 'password1' },
-    { email: 'user2@example.com', password: 'password2' },
+    { email: 'alice@example.com',   username: 'alice_dev',    password: 'password1' },
+    { email: 'bob@example.com',     username: 'bob_builds',   password: 'password2' },
+    { email: 'carol@example.com',   username: 'carol_ux',     password: 'password3' },
+    { email: 'dan@example.com',     username: 'dan_ops',      password: 'password4' },
+    { email: 'eve@example.com',     username: 'eve_startup',  password: 'password5' },
   ];
 
   const savedUsers: User[] = [];
@@ -22,65 +25,131 @@ async function seed(): Promise<void> {
     if (!user) {
       user = userRepo.create({
         email: userData.email,
+        username: userData.username,
         passwordHash: await bcrypt.hash(userData.password, 10),
         refreshTokenHash: null,
       });
       user = await userRepo.save(user);
-      console.log(`Created user: ${user.email}`);
+      console.log(`Created user: ${user.username}`);
     } else {
-      console.log(`User already exists: ${user.email}`);
+      console.log(`User already exists: ${user.username}`);
     }
     savedUsers.push(user);
   }
 
-  const [user1, user2] = savedUsers;
+  const [alice, bob, carol, dan, eve] = savedUsers;
 
   // --- Events ---
   const eventsData = [
     {
-      title: 'Tech Meetup: NestJS Deep Dive',
-      description:
-        'An in-depth exploration of NestJS architecture and best practices.',
-      dateTime: new Date('2026-04-15T18:00:00Z'),
-      location: 'Tech Hub, Kyiv',
-      capacity: 50,
+      title: 'TypeScript Fundamentals',
+      description: 'A hands-on intro to TypeScript — types, interfaces, generics.',
+      dateTime: new Date('2026-03-10T10:00:00Z'),
+      location: 'Online (Zoom)',
+      capacity: 30,
       visibility: EventVisibility.PUBLIC,
-      organizer: user1,
+      organizer: alice,
     },
     {
-      title: 'Frontend Workshop: React Performance',
-      description: 'Learn advanced React performance optimization techniques.',
-      dateTime: new Date('2026-05-10T10:00:00Z'),
-      location: 'Innovation Center, Kyiv',
-      capacity: 100,
+      title: 'Docker for Developers',
+      description: 'Containerize your apps from zero to production.',
+      dateTime: new Date('2026-03-15T14:00:00Z'),
+      location: 'Tech Hub, Kyiv',
+      capacity: 20,
       visibility: EventVisibility.PUBLIC,
-      organizer: user1,
+      organizer: bob,
+    },
+    {
+      title: 'UX Design Sprint',
+      description: 'A 3-hour design sprint — from problem to prototype.',
+      dateTime: new Date('2026-03-22T11:00:00Z'),
+      location: 'Creative Space, Lviv',
+      capacity: 15,
+      visibility: EventVisibility.PUBLIC,
+      organizer: carol,
+    },
+    {
+      title: 'Private Team Retrospective',
+      description: 'Q1 retrospective for the core team only.',
+      dateTime: new Date('2026-03-28T16:00:00Z'),
+      location: 'Office, Kyiv',
+      capacity: 10,
+      visibility: EventVisibility.PRIVATE,
+      organizer: dan,
+    },
+    {
+      title: 'NestJS Deep Dive',
+      description: 'Advanced NestJS patterns: guards, interceptors, custom decorators.',
+      dateTime: new Date('2026-04-05T18:00:00Z'),
+      location: 'Innovation Center, Kyiv',
+      capacity: 50,
+      visibility: EventVisibility.PUBLIC,
+      organizer: alice,
+    },
+    {
+      title: 'React Performance Workshop',
+      description: 'Memoization, lazy loading, and profiling React apps.',
+      dateTime: new Date('2026-04-12T10:00:00Z'),
+      location: 'Tech Hub, Kyiv',
+      capacity: 40,
+      visibility: EventVisibility.PUBLIC,
+      organizer: alice,
     },
     {
       title: 'Startup Networking Evening',
-      description: 'Connect with startup founders and investors.',
-      dateTime: new Date('2026-06-20T19:00:00Z'),
+      description: 'Connect with founders and investors over drinks.',
+      dateTime: new Date('2026-04-20T19:00:00Z'),
       location: 'Startup Campus, Kyiv',
       capacity: null,
       visibility: EventVisibility.PUBLIC,
-      organizer: user2,
+      organizer: eve,
+    },
+    {
+      title: 'PostgreSQL & TypeORM Masterclass',
+      description: 'Migrations, relations, query optimization with TypeORM.',
+      dateTime: new Date('2026-04-27T14:00:00Z'),
+      location: 'Online (Google Meet)',
+      capacity: 60,
+      visibility: EventVisibility.PUBLIC,
+      organizer: bob,
+    },
+    {
+      title: 'Workshop at Full Capacity',
+      description: 'Hands-on workshop — limited to 3 seats, all taken.',
+      dateTime: new Date('2026-05-08T10:00:00Z'),
+      location: 'Coworking Space, Kyiv',
+      capacity: 3,
+      visibility: EventVisibility.PUBLIC,
+      organizer: carol,
+    },
+    {
+      title: 'CI/CD Pipelines with GitHub Actions',
+      description: 'Build, test, and deploy automatically using GitHub Actions.',
+      dateTime: new Date('2026-05-18T10:00:00Z'),
+      location: 'Online (Zoom)',
+      capacity: 100,
+      visibility: EventVisibility.PUBLIC,
+      organizer: dan,
+    },
+    {
+      title: 'Product Demo Day',
+      description: 'Teams present their Q2 builds. Open to all.',
+      dateTime: new Date('2026-05-28T15:00:00Z'),
+      location: 'Main Stage, Kyiv',
+      capacity: 200,
+      visibility: EventVisibility.PUBLIC,
+      organizer: eve,
     },
   ];
 
   const savedEvents: Event[] = [];
   for (const eventData of eventsData) {
     let event = await eventRepo.findOne({
-      where: {
-        title: eventData.title,
-        organizer: { id: eventData.organizer.id },
-      },
+      where: { title: eventData.title, organizer: { id: eventData.organizer.id } },
       relations: ['participants'],
     });
     if (!event) {
-      event = eventRepo.create({
-        ...eventData,
-        participants: [],
-      });
+      event = eventRepo.create({ ...eventData, participants: [] });
       event = await eventRepo.save(event);
       console.log(`Created event: ${event.title}`);
     } else {
@@ -89,18 +158,61 @@ async function seed(): Promise<void> {
     savedEvents.push(event);
   }
 
-  // --- Participants: user1 joins event3 ---
-  const event3 = await eventRepo.findOne({
-    where: { id: savedEvents[2].id },
-    relations: ['participants'],
-  });
+  const [
+    evTypescript,   // 0  organizer: alice (Mar 10)
+    evDocker,       // 1  organizer: bob   (Mar 15)
+    evUx,           // 2  organizer: carol (Mar 22)
+    evRetro,        // 3  organizer: dan   (Mar 28, private)
+    evNest,         // 4  organizer: alice (Apr 5)
+    evReact,        // 5  organizer: alice (Apr 12)
+    evNetworking,   // 6  organizer: eve   (Apr 20, unlimited)
+    evPg,           // 7  organizer: bob   (Apr 27)
+    evFull,         // 8  organizer: carol (May 8, full 3/3)
+    evCicd,         // 9  organizer: dan   (May 18)
+    evDemo,         // 10 organizer: eve   (May 28)
+  ] = savedEvents;
 
-  if (event3 && !event3.participants.some((p) => p.id === user1.id)) {
-    event3.participants.push(user1);
-    await eventRepo.save(event3);
-    console.log(`user1 joined: ${event3.title}`);
-  } else {
-    console.log(`user1 already joined event3 or event3 not found`);
+  // --- Participants ---
+  // Format: [event, [...users to add]] — organizer is always first to mirror EventsService.create() behaviour
+  const participations: [Event, User[]][] = [
+    [evTypescript,  [alice, bob, carol, dan, eve]],   // alice = organizer (5/30)
+    [evDocker,      [bob, alice, carol, dan]],         // bob   = organizer (4/20)
+    [evUx,          [carol, alice, bob, dan, eve]],   // carol = organizer (5/15)
+    [evRetro,       [dan, alice, carol]],              // dan   = organizer (3/10, private)
+    [evNest,        [alice, bob, carol, dan, eve]],   // alice = organizer (5/50)
+    [evReact,       [alice, bob, carol, eve]],         // alice = organizer (4/40)
+    [evNetworking,  [eve, alice, bob, carol, dan]],   // eve   = organizer (5/unlimited)
+    [evPg,          [bob, alice, carol, eve]],         // bob   = organizer (4/60)
+    [evFull,        [carol, alice, bob]],              // carol = organizer (3/3, FULL)
+    [evCicd,        [dan, alice, bob, eve]],           // dan   = organizer (4/100)
+    [evDemo,        [eve, alice, bob, carol, dan]],   // eve   = organizer (5/200)
+  ];
+
+  for (const [event, users] of participations) {
+    const freshEvent = await eventRepo.findOne({
+      where: { id: event.id },
+      relations: ['participants'],
+    });
+    if (!freshEvent) continue;
+
+    let changed = false;
+    for (const user of users) {
+      if (!user?.id || freshEvent.participants.some((p) => p.id === user.id)) continue;
+      // skip dummy placeholders (used only for capacity fill visual)
+      try {
+        const realUser = await userRepo.findOneBy({ id: user.id });
+        if (!realUser) continue;
+        freshEvent.participants.push(realUser);
+        changed = true;
+      } catch {
+        continue;
+      }
+    }
+
+    if (changed) {
+      await eventRepo.save(freshEvent);
+      console.log(`Updated participants for: ${freshEvent.title}`);
+    }
   }
 
   await AppDataSource.destroy();

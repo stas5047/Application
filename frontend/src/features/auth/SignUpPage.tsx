@@ -38,7 +38,7 @@ export default function SignUpPage() {
   const onSubmit = async (values: SignUpFormValues) => {
     setIsLoading(true);
     try {
-      const data = await authService.register({ email: values.email, password: values.password });
+      const data = await authService.register({ email: values.email, username: values.username, password: values.password });
       storeLogin(data);
       navigate('/events', { replace: true });
     } finally {
@@ -55,6 +55,22 @@ export default function SignUpPage() {
 
         <CardContent>
           <form id="signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="username">
+                Username <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="john_doe"
+                autoComplete="username"
+                {...register('username')}
+              />
+              {errors.username && (
+                <p className="text-destructive text-sm mt-1">{errors.username.message}</p>
+              )}
+            </div>
+
             <div className="space-y-1">
               <Label htmlFor="email">
                 Email <span className="text-destructive">*</span>

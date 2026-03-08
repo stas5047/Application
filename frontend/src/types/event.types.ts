@@ -3,12 +3,12 @@ export type EventRole = 'organizer' | 'participant';
 
 export interface EventOrganizer {
   id: string;
-  email: string;
+  username: string;
 }
 
 export interface EventParticipant {
   id: string;
-  email: string;
+  username: string;
 }
 
 export interface EventForCta {

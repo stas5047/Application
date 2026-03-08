@@ -14,6 +14,7 @@ describe('AuthService', () => {
   const mockUser = {
     id: 'user-uuid-1',
     email: 'test@example.com',
+    username: 'testuser',
     passwordHash: '',
     refreshTokenHash: null as string | null,
     createdAt: new Date(),
@@ -29,6 +30,7 @@ describe('AuthService', () => {
           provide: UsersService,
           useValue: {
             findByEmail: jest.fn(),
+            findByUsername: jest.fn(),
             findById: jest.fn(),
             create: jest.fn(),
             updateRefreshTokenHash: jest.fn(),
@@ -64,24 +66,34 @@ describe('AuthService', () => {
   describe('register', () => {
     it('should return accessToken and refreshToken on success', async () => {
       usersService.findByEmail.mockResolvedValue(null);
+      usersService.findByUsername.mockResolvedValue(null);
       usersService.create.mockResolvedValue({ ...mockUser });
       usersService.updateRefreshTokenHash.mockResolvedValue(undefined);
       jwtService.sign
         .mockReturnValueOnce('access-token')
         .mockReturnValueOnce('refresh-token');
 
-      const result = await service.register('test@example.com', 'password123');
+      const result = await service.register('test@example.com', 'testuser', 'password123');
 
       expect(result.accessToken).toBe('access-token');
       expect(result.refreshToken).toBe('refresh-token');
-      expect(result.user.email).toBe('test@example.com');
+      expect(result.user.username).toBe('testuser');
     });
 
     it('should throw ConflictException for duplicate email', async () => {
       usersService.findByEmail.mockResolvedValue({ ...mockUser });
 
       await expect(
-        service.register('test@example.com', 'password123'),
+        service.register('test@example.com', 'testuser', 'password123'),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw ConflictException for duplicate username', async () => {
+      usersService.findByEmail.mockResolvedValue(null);
+      usersService.findByUsername.mockResolvedValue({ ...mockUser });
+
+      await expect(
+        service.register('other@example.com', 'testuser', 'password123'),
       ).rejects.toThrow(ConflictException);
     });
   });
@@ -123,7 +135,7 @@ describe('AuthService', () => {
       const existingHash = await bcrypt.hash(oldRefreshToken, 10);
       jwtService.verify.mockReturnValue({
         sub: mockUser.id,
-        email: mockUser.email,
+        username: mockUser.username,
       });
       usersService.findById.mockResolvedValue({
         ...mockUser,
