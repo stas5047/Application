@@ -193,6 +193,8 @@ export default function MyEventsPage() {
           agendaDateFormat: 'dd/MM/yyyy',
           dayFormat: 'dd/MM/yyyy',
           dateFormat: 'dd',
+          timeGutterFormat: 'hh:mm a',
+          agendaTimeRangeFormat: ({ start }: { start: Date }) => format(start, 'hh:mm a'),
         }}
       />
       </div>
