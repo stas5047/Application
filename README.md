@@ -1,4 +1,4 @@
-# Event Management System
+# Event Management System (EventHub)
 
 A full-stack PoC for creating, joining, and managing events with calendar views.
 
@@ -14,8 +14,10 @@ A full-stack PoC for creating, joining, and managing events with calendar views.
 ---
 
 ## Quick Start
-
 ```bash
+git clone https://github.com/stas5047/Application
+cd Application
+cp .env.example .env
 cp docker/.env.example docker/.env
 docker compose up --build -d
 ```
@@ -32,25 +34,26 @@ The first launch automatically runs database migrations and seeds the database.
 
 **Clean restart (wipe DB and reseed):**
 ```bash
-docker compose down -v && docker compose up --build -d
+docker compose down -v
+docker compose up --build -d
 ```
 
 ---
 
 ## Project Structure
 
-| Directory | Description |
-|-----------|-------------|
-| `backend/` | NestJS REST API (auth, events CRUD, user endpoints) |
+| Directory | Description                                               |
+|-----------|-----------------------------------------------------------|
+| `backend/` | NestJS REST API (auth, events CRUD, user endpoints)       |
 | `frontend/` | React SPA (Vite, Tailwind, Shadcn UI, react-big-calendar) |
-| `docker/` | Environment files and Docker configurations |
-| `docs/` | SRS and roadmap |
+| `docker/` | Environment files and Docker configurations               |
+| `docs/` | SRS with images                                           |
 
 ---
 
 ## Environment Variables
 
-Copy `docker/.env.example` to `docker/.env` and adjust as needed.
+Copy `.env.example` to `.env` and `docker/.env.example` to `docker/.env` (both are required).
 
 | Variable | Description | Default |
 |----------|-------------|---------|
