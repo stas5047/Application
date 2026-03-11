@@ -92,6 +92,7 @@ export default function EventsPage() {
             capacity={e.capacity}
             participantCount={e.participantCount}
             isOrganizer={!!userId && e.organizerId === userId}
+            tags={e.tags}
             onClick={() => void navigate(`/events/${e.id}`)}
             cta={
               <EventCta

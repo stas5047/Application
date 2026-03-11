@@ -6,7 +6,14 @@ import { useEventsStore } from '@/store/events.store';
 
 function toCalendarEvent(raw: MyEventResponse): CalendarEventItem {
   const start = parseISO(raw.dateTime);
-  return { id: raw.id, title: raw.title, start, end: addHours(start, 1), role: raw.role };
+  return {
+    id: raw.id,
+    title: raw.title,
+    start,
+    end: addHours(start, 1),
+    role: raw.role,
+    tags: raw.tags?.map((t) => t.name),
+  };
 }
 
 export function useMyEvents() {
