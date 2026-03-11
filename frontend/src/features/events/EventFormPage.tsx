@@ -11,6 +11,7 @@ import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Spinner } from '@/components/ui/spinner';
 import { PageLoader } from '@/components/ui/page-loader';
 import { EmptyState } from '@/components/ui/empty-state';
+import { TagMultiSelect } from '@/components/ui/tag-multi-select';
 
 export default function EventFormPage() {
   const { id } = useParams<{ id?: string }>();
@@ -70,6 +71,30 @@ export default function EventFormPage() {
             />
             {errors.description && (
               <p className="text-destructive text-sm">{errors.description.message}</p>
+            )}
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="tagNames">
+              Tags{' '}
+              <span className="text-xs font-normal text-muted-foreground">(optional, max 5)</span>
+            </Label>
+            <Controller
+              name="tagNames"
+              control={control}
+              render={({ field }) => (
+                <TagMultiSelect
+                  id="tagNames"
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                  maxTags={5}
+                  disabled={isSubmitting}
+                />
+              )}
+            />
+            {errors.tagNames && (
+              <p className="text-destructive text-sm">{errors.tagNames.message}</p>
             )}
           </div>
 
