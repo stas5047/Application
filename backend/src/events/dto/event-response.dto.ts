@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventVisibility } from '../entities/event.entity';
+import { TagResponseDto } from '../../tags/dto/tag-response.dto';
 
 export class EventOrganizerDto {
   @ApiProperty()
@@ -50,6 +51,9 @@ export class EventSummaryResponseDto {
 
   @ApiProperty()
   isJoined!: boolean;
+
+  @ApiProperty({ type: () => [TagResponseDto] })
+  tags!: TagResponseDto[];
 
   @ApiProperty()
   createdAt!: Date;

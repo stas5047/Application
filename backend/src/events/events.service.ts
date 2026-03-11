@@ -14,12 +14,14 @@ import {
   EventDetailResponseDto,
   EventSummaryResponseDto,
 } from './dto/event-response.dto';
+import { TagsService } from '../tags/tags.service';
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectRepository(Event)
     private readonly repo: Repository<Event>,
+    private readonly tagsService: TagsService,
   ) {}
 
   private assertFutureDate(dateTime: string): void {
@@ -46,6 +48,7 @@ export class EventsService {
     const events = (await this.repo
       .createQueryBuilder('event')
       .leftJoinAndSelect('event.organizer', 'organizer')
+      .leftJoinAndSelect('event.tags', 'tag')
       .loadRelationCountAndMap('event.participantCount', 'event.participants')
       .where('event.visibility = :visibility', {
         visibility: EventVisibility.PUBLIC,
@@ -75,6 +78,7 @@ export class EventsService {
       organizer: { id: event.organizer.id, username: event.organizer.username },
       participantCount: event.participantCount,
       isJoined: userId ? joinedSet.has(event.id) : false,
+      tags: event.tags.map((t) => ({ id: t.id, name: t.name })),
       createdAt: event.createdAt,
     }));
   }
@@ -82,7 +86,7 @@ export class EventsService {
   async findOne(id: string, userId?: string): Promise<EventDetailResponseDto> {
     const event = await this.repo.findOne({
       where: { id },
-      relations: { organizer: true, participants: true },
+      relations: { organizer: true, participants: true, tags: true },
     });
     if (!event) throw new NotFoundException('Event not found');
     const isJoined = userId
@@ -100,6 +104,7 @@ export class EventsService {
       organizer: { id: event.organizer.id, username: event.organizer.username },
       participantCount: event.participants.length,
       isJoined,
+      tags: event.tags.map((t) => ({ id: t.id, name: t.name })),
       createdAt: event.createdAt,
       participants: event.participants.map((p) => ({
         id: p.id,
@@ -123,6 +128,10 @@ export class EventsService {
       organizerId,
     });
     const saved = await this.repo.save(entity);
+    if (dto.tagNames && dto.tagNames.length > 0) {
+      saved.tags = await this.tagsService.findOrCreateByNames(dto.tagNames);
+      await this.repo.save(saved);
+    }
     await this.repo
       .createQueryBuilder()
       .relation(Event, 'participants')
@@ -136,14 +145,26 @@ export class EventsService {
     dto: UpdateEventDto,
     userId: string,
   ): Promise<EventDetailResponseDto> {
-    const event = await this.findEventOrFail(id);
+    const event = await this.repo.findOne({
+      where: { id },
+      relations: { tags: true },
+    });
+    if (!event) throw new NotFoundException('Event not found');
     if (event.organizerId !== userId)
       throw new ForbiddenException('Only the organizer can modify this event');
     if (dto.dateTime) this.assertFutureDate(dto.dateTime);
+
+    const { tagNames, ...scalarFields } = dto;
+
     Object.assign(event, {
-      ...dto,
+      ...scalarFields,
       dateTime: dto.dateTime ? new Date(dto.dateTime) : event.dateTime,
     });
+
+    if (tagNames !== undefined) {
+      event.tags = await this.tagsService.findOrCreateByNames(tagNames);
+    }
+
     await this.repo.save(event);
     return this.findOne(id, userId);
   }

@@ -9,6 +9,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { EventsService } from './events.service';
 import { Event, EventVisibility } from './entities/event.entity';
 import { User } from '../users/entities/user.entity';
+import { TagsService } from '../tags/tags.service';
 
 type MockRelationQueryBuilder = {
   of: jest.Mock;
@@ -59,9 +60,14 @@ const buildEvent = (overrides: Partial<Event> = {}): Event =>
     organizerId: 'organizer-uuid',
     organizer: buildUser('organizer-uuid', 'org@example.com'),
     participants: [],
+    tags: [],
     createdAt: new Date(),
     ...overrides,
   }) as Event;
+
+const mockTagsService = {
+  findOrCreateByNames: jest.fn().mockResolvedValue([]),
+};
 
 describe('EventsService', () => {
   let service: EventsService;
@@ -92,6 +98,7 @@ describe('EventsService', () => {
       providers: [
         EventsService,
         { provide: getRepositoryToken(Event), useValue: mockRepo },
+        { provide: TagsService, useValue: mockTagsService },
       ],
     }).compile();
 

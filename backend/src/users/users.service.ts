@@ -26,7 +26,11 @@ export class UsersService {
     return this.userRepository.findOneBy({ username });
   }
 
-  async create(email: string, username: string, passwordHash: string): Promise<User> {
+  async create(
+    email: string,
+    username: string,
+    passwordHash: string,
+  ): Promise<User> {
     const user = this.userRepository.create({
       email,
       username,
@@ -59,6 +63,7 @@ export class UsersService {
         'event.location',
         'event.organizerId',
       ])
+      .leftJoinAndSelect('event.tags', 'tag')
       .orderBy('event.dateTime', 'ASC')
       .getMany();
 
@@ -68,6 +73,7 @@ export class UsersService {
       dateTime: event.dateTime,
       location: event.location,
       role: event.organizerId === userId ? 'organizer' : 'participant',
+      tags: event.tags.map((t) => ({ id: t.id, name: t.name })),
     }));
   }
 }
