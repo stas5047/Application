@@ -1,4 +1,5 @@
 import type { EventRole } from './event.types';
+import type { TagResponse } from './tag.types';
 
 export interface ApiError {
   statusCode: number;
@@ -13,4 +14,5 @@ export interface MyEventResponse {
   dateTime: string;
   location: string;
   role: EventRole;
+  tags: TagResponse[];
 }
