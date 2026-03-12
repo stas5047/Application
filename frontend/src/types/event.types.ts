@@ -1,3 +1,5 @@
+import type { TagResponse } from './tag.types';
+
 export type EventVisibility = 'public' | 'private';
 export type EventRole = 'organizer' | 'participant';
 
@@ -26,6 +28,7 @@ export interface EventSummaryResponse extends EventForCta {
   location: string;
   visibility: EventVisibility;
   organizer: EventOrganizer;
+  tags: TagResponse[];
   createdAt: string;
 }
 
@@ -40,6 +43,7 @@ export interface CreateEventRequest {
   location: string;
   capacity?: number;
   visibility?: EventVisibility;
+  tagNames?: string[];
 }
 
 export type UpdateEventRequest = Partial<CreateEventRequest>;

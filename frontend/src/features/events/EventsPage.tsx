@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarDays, Search } from 'lucide-react';
+import { CalendarDays, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { useEventsStore } from '@/store/events.store';
 import { EventCardSkeleton } from './components/EventCardSkeleton';
 import { EventCta } from './components/EventCta';
+import { TagFilter } from './components/TagFilter';
 import { useEventActions } from './hooks/useEventActions';
 
 export default function EventsPage() {
@@ -19,10 +20,14 @@ export default function EventsPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const userId = useAuthStore((s) => s.user?.id);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const filteredEvents = events.filter((e) =>
-    e.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredEvents = events.filter((e) => {
+    const matchesSearch = e.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTags =
+      selectedTags.length === 0 || e.tags.some((t) => selectedTags.includes(t.name));
+    return matchesSearch && matchesTags;
+  });
 
   const pageHeader = (
     <div className="mb-6">
@@ -38,6 +43,9 @@ export default function EventsPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-9"
         />
+      </div>
+      <div className="mt-4">
+        <TagFilter selectedTags={selectedTags} onTagsChange={setSelectedTags} />
       </div>
     </div>
   );
@@ -80,35 +88,44 @@ export default function EventsPage() {
   return (
     <div className="py-8">
       {pageHeader}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredEvents.map((e) => (
-          <EventCard
-            key={e.id}
-            id={e.id}
-            title={e.title}
-            description={e.description}
-            dateTime={e.dateTime}
-            location={e.location}
-            capacity={e.capacity}
-            participantCount={e.participantCount}
-            isOrganizer={!!userId && e.organizerId === userId}
-            onClick={() => void navigate(`/events/${e.id}`)}
-            cta={
-              <EventCta
-                eventId={e.id}
-                capacity={e.capacity}
-                participantCount={e.participantCount}
-                isJoined={e.isJoined}
-                isAuthenticated={isAuthenticated}
-                isInFlight={loadingIds.has(e.id)}
-                isOrganizer={!!userId && e.organizerId === userId}
-                onJoin={(id) => void handleJoin(id)}
-                onLeave={(id) => void handleLeave(id)}
-              />
-            }
-          />
-        ))}
-      </div>
+      {filteredEvents.length === 0 ? (
+        <EmptyState
+          icon={Filter}
+          heading="No events found"
+          subText="No events match the selected tags."
+        />
+      ) : (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredEvents.map((e) => (
+            <EventCard
+              key={e.id}
+              id={e.id}
+              title={e.title}
+              description={e.description}
+              dateTime={e.dateTime}
+              location={e.location}
+              capacity={e.capacity}
+              participantCount={e.participantCount}
+              isOrganizer={!!userId && e.organizerId === userId}
+              tags={e.tags}
+              onClick={() => void navigate(`/events/${e.id}`)}
+              cta={
+                <EventCta
+                  eventId={e.id}
+                  capacity={e.capacity}
+                  participantCount={e.participantCount}
+                  isJoined={e.isJoined}
+                  isAuthenticated={isAuthenticated}
+                  isInFlight={loadingIds.has(e.id)}
+                  isOrganizer={!!userId && e.organizerId === userId}
+                  onJoin={(id) => void handleJoin(id)}
+                  onLeave={(id) => void handleLeave(id)}
+                />
+              }
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

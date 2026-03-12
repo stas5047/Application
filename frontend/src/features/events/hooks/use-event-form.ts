@@ -38,6 +38,7 @@ export function useEventForm({ id }: UseEventFormOptions): UseEventFormResult {
       location: '',
       capacity: undefined,
       visibility: 'public',
+      tagNames: [],
     },
   });
   const { reset } = form;
@@ -62,6 +63,7 @@ export function useEventForm({ id }: UseEventFormOptions): UseEventFormResult {
           location: event.location,
           capacity: event.capacity ?? undefined,
           visibility: event.visibility,
+          tagNames: event.tags?.map((t) => t.name) ?? [],
         });
       })
       .catch(() => {
@@ -82,6 +84,7 @@ export function useEventForm({ id }: UseEventFormOptions): UseEventFormResult {
       dateTime: values.dateTime.toISOString(),
       capacity: values.capacity ?? undefined,
       description: values.description || undefined,
+      tagNames: values.tagNames?.length ? values.tagNames : undefined,
     };
     try {
       if (isEditMode) {

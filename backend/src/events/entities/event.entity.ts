@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Tag } from '../../tags/entities/tag.entity';
 
 export enum EventVisibility {
   PUBLIC = 'public',
@@ -57,6 +58,14 @@ export class Event {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   participants!: User[];
+
+  @ManyToMany(() => Tag, (tag) => tag.events, { eager: false })
+  @JoinTable({
+    name: 'event_tags',
+    joinColumn: { name: 'event_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
+  })
+  tags!: Tag[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;

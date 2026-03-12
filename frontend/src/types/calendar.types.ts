@@ -6,4 +6,5 @@ export interface CalendarEventItem {
   start: Date;
   end: Date;
   role: EventRole;
+  tags?: string[];
 }

@@ -1,4 +1,6 @@
 import {
+  ArrayMaxSize,
+  IsArray,
   IsEnum,
   IsInt,
   IsISO8601,
@@ -45,4 +47,12 @@ export class CreateEventDto {
   @IsOptional()
   @IsEnum(EventVisibility)
   visibility?: EventVisibility;
+
+  @ApiPropertyOptional({ type: [String], maxItems: 5 })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMaxSize(5)
+  @MaxLength(30, { each: true })
+  tagNames?: string[];
 }

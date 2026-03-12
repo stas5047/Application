@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TagResponseDto } from '../../tags/dto/tag-response.dto';
 
 export class MyEventResponseDto {
   @ApiProperty({ description: 'Event UUID' })
@@ -19,4 +20,7 @@ export class MyEventResponseDto {
 
   @ApiProperty({ enum: ['organizer', 'participant'] })
   role!: 'organizer' | 'participant';
+
+  @ApiProperty({ type: () => [TagResponseDto] })
+  tags!: TagResponseDto[];
 }

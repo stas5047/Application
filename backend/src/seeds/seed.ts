@@ -3,12 +3,14 @@ import * as bcrypt from 'bcrypt';
 import { AppDataSource } from '../data-source';
 import { User } from '../users/entities/user.entity';
 import { Event, EventVisibility } from '../events/entities/event.entity';
+import { Tag } from '../tags/entities/tag.entity';
 
 async function seed(): Promise<void> {
   await AppDataSource.initialize();
 
   const userRepo = AppDataSource.getRepository(User);
   const eventRepo = AppDataSource.getRepository(Event);
+  const tagRepo = AppDataSource.getRepository(Tag);
 
   // --- Users ---
   const usersData = [
@@ -158,6 +160,25 @@ async function seed(): Promise<void> {
     savedEvents.push(event);
   }
 
+  // --- Tags ---
+  const tagNames = [
+    'tech', 'art', 'business', 'music', 'sports',
+    'health', 'education', 'networking', 'design', 'devops',
+  ];
+
+  const savedTags: Record<string, Tag> = {};
+  for (const name of tagNames) {
+    let tag = await tagRepo.findOneBy({ name });
+    if (!tag) {
+      tag = tagRepo.create({ name });
+      tag = await tagRepo.save(tag);
+      console.log(`Created tag: ${tag.name}`);
+    } else {
+      console.log(`Tag already exists: ${tag.name}`);
+    }
+    savedTags[name] = tag;
+  }
+
   const [
     evTypescript,   // 0  organizer: alice (Mar 10)
     evDocker,       // 1  organizer: bob   (Mar 15)
@@ -212,6 +233,43 @@ async function seed(): Promise<void> {
     if (changed) {
       await eventRepo.save(freshEvent);
       console.log(`Updated participants for: ${freshEvent.title}`);
+    }
+  }
+
+  // --- Tag Assignments ---
+  const tagAssignments: [Event, string[]][] = [
+    [evTypescript,  ['tech', 'education']],
+    [evDocker,      ['tech', 'devops']],
+    [evUx,          ['design', 'art']],
+    [evRetro,       ['business']],
+    [evNest,        ['tech', 'education']],
+    [evReact,       ['tech']],
+    [evNetworking,  ['networking', 'business']],
+    [evPg,          ['tech', 'education']],
+    [evFull,        ['education']],
+    [evCicd,        ['tech', 'devops']],
+    [evDemo,        ['business', 'networking']],
+  ];
+
+  for (const [event, names] of tagAssignments) {
+    const freshEvent = await eventRepo.findOne({
+      where: { id: event.id },
+      relations: ['tags'],
+    });
+    if (!freshEvent) continue;
+
+    let changed = false;
+    for (const name of names) {
+      const tag = savedTags[name];
+      if (!tag) continue;
+      if (freshEvent.tags.some((t) => t.id === tag.id)) continue;
+      freshEvent.tags.push(tag);
+      changed = true;
+    }
+
+    if (changed) {
+      await eventRepo.save(freshEvent);
+      console.log(`Updated tags for: ${freshEvent.title}`);
     }
   }
 

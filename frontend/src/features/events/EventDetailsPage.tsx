@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { AlertCircle, ArrowLeft, CalendarDays, MapPin, Pencil, Trash2, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { getTagColor } from '@/lib/tag-colors';
 import { useAuthStore } from '@/store/auth.store';
 import { useEventDetail } from '@/features/events/hooks/use-event-detail';
 import { EventCta } from '@/features/events/components/EventCta';
@@ -137,6 +140,18 @@ export default function EventDetailsPage() {
                 <span>{capacityText}</span>
               </div>
               <CapacityBar participantCount={event.participantCount} capacity={event.capacity} />
+              {event.tags && event.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {event.tags.map((tag) => {
+                    const { bg, text } = getTagColor(tag.name);
+                    return (
+                      <Badge key={tag.id} className={cn('rounded-full', bg, text)}>
+                        {tag.name.charAt(0).toUpperCase() + tag.name.slice(1)}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              )}
               {event.description && (
                 <p className="text-muted-foreground border-border mt-4 border-t pt-4 text-sm leading-relaxed">
                   {event.description}

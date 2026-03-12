@@ -23,6 +23,11 @@ export const eventSchema = yup.object({
     .oneOf(['public', 'private'])
     .optional()
     .default('public'),
+  tagNames: yup
+    .array()
+    .of(yup.string().required().max(30))
+    .max(5, 'Maximum 5 tags allowed')
+    .default([]),
 });
 
 export type EventFormValues = yup.InferType<typeof eventSchema>;

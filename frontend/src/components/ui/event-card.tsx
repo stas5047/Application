@@ -2,8 +2,11 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { CapacityBar } from '@/components/ui/capacity-bar';
 import { cn } from '@/lib/utils';
+import { getTagColor } from '@/lib/tag-colors';
+import type { TagResponse } from '@/types/tag.types';
 
 interface EventCardProps {
   id: string;
@@ -14,6 +17,7 @@ interface EventCardProps {
   capacity: number | null;
   participantCount: number;
   isOrganizer?: boolean;
+  tags?: TagResponse[];
   cta: React.ReactNode;
   onClick?: () => void;
 }
@@ -26,6 +30,7 @@ export function EventCard({
   capacity,
   participantCount,
   isOrganizer,
+  tags,
   cta,
   onClick,
 }: EventCardProps) {
@@ -80,6 +85,21 @@ export function EventCard({
           <span>{participantText}</span>
         </div>
         <CapacityBar participantCount={participantCount} capacity={capacity} />
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 pt-1">
+            {tags.slice(0, 3).map((tag) => {
+              const { bg, text } = getTagColor(tag.name);
+              return (
+                <Badge key={tag.id} className={cn('rounded-full', bg, text)}>
+                  {tag.name.charAt(0).toUpperCase() + tag.name.slice(1)}
+                </Badge>
+              );
+            })}
+            {tags.length > 3 && (
+              <Badge variant="secondary">+{tags.length - 3}</Badge>
+            )}
+          </div>
+        )}
       </CardContent>
       <CardFooter className="mt-auto">{cta}</CardFooter>
     </Card>
