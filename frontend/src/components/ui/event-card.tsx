@@ -41,7 +41,7 @@ export function EventCard({
   return (
     <Card
       className={cn(
-        'group flex flex-col transition-all',
+        'group flex flex-col h-full transition-all',
         onClick &&
           'cursor-pointer hover:shadow-md hover:border-primary/30 hover:-translate-y-px',
       )}

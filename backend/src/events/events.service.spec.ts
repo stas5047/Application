@@ -10,6 +10,7 @@ import { EventsService } from './events.service';
 import { Event, EventVisibility } from './entities/event.entity';
 import { User } from '../users/entities/user.entity';
 import { TagsService } from '../tags/tags.service';
+import { RecommendationsService } from '../recommendations/recommendations.service';
 
 type MockRelationQueryBuilder = {
   of: jest.Mock;
@@ -69,6 +70,10 @@ const mockTagsService = {
   findOrCreateByNames: jest.fn().mockResolvedValue([]),
 };
 
+const mockRecommendationsService = {
+  invalidateCache: jest.fn(),
+};
+
 describe('EventsService', () => {
   let service: EventsService;
   let relationQb: MockRelationQueryBuilder;
@@ -99,6 +104,7 @@ describe('EventsService', () => {
         EventsService,
         { provide: getRepositoryToken(Event), useValue: mockRepo },
         { provide: TagsService, useValue: mockTagsService },
+        { provide: RecommendationsService, useValue: mockRecommendationsService },
       ],
     }).compile();
 

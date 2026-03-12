@@ -9,5 +9,6 @@ import { RecommendationsController } from './recommendations.controller';
   imports: [TypeOrmModule.forFeature([Event]), UsersModule],
   providers: [RecommendationsService],
   controllers: [RecommendationsController],
+  exports: [RecommendationsService],
 })
 export class RecommendationsModule {}

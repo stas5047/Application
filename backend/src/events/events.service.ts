@@ -15,6 +15,7 @@ import {
   EventSummaryResponseDto,
 } from './dto/event-response.dto';
 import { TagsService } from '../tags/tags.service';
+import { RecommendationsService } from '../recommendations/recommendations.service';
 
 @Injectable()
 export class EventsService {
@@ -22,6 +23,7 @@ export class EventsService {
     @InjectRepository(Event)
     private readonly repo: Repository<Event>,
     private readonly tagsService: TagsService,
+    private readonly recommendationsService: RecommendationsService,
   ) {}
 
   private assertFutureDate(dateTime: string): void {
@@ -187,6 +189,7 @@ export class EventsService {
       .relation(Event, 'participants')
       .of(id)
       .add(userId);
+    this.recommendationsService.invalidateCache(userId);
     return this.findOne(id, userId);
   }
 
@@ -201,6 +204,7 @@ export class EventsService {
       .relation(Event, 'participants')
       .of(id)
       .remove(userId);
+    this.recommendationsService.invalidateCache(userId);
     return this.findOne(id, userId);
   }
 }

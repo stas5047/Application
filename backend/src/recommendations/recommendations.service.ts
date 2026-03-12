@@ -43,6 +43,10 @@ export class RecommendationsService {
     this.cache.set(userId, { data, expiresAt: Date.now() + CACHE_TTL_MS });
   }
 
+  invalidateCache(userId: string): void {
+    this.cache.delete(userId);
+  }
+
   async getPersonalizedRecommendations(
     userId: string,
     limit = DEFAULT_LIMIT,
@@ -61,14 +65,7 @@ export class RecommendationsService {
       .where('event.visibility = :v', { v: 'public' })
       .andWhere('event.organizerId != :userId', { userId })
       .andWhere(
-        (qb) =>
-          'event.id NOT IN ' +
-          qb
-            .subQuery()
-            .select('ep.event_id')
-            .from('event_participants', 'ep')
-            .where('ep.user_id = :userId', { userId })
-            .getQuery(),
+        `event.id NOT IN (SELECT ep.event_id FROM event_participants ep WHERE ep.user_id = :userId)`,
       )
       .getMany();
 
