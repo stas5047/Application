@@ -76,4 +76,19 @@ export class UsersService {
       tags: event.tags.map((t) => ({ id: t.id, name: t.name })),
     }));
   }
+
+  async getAttendedTags(userId: string): Promise<string[]> {
+    const attendedEvents = await this.eventRepository
+      .createQueryBuilder('event')
+      .innerJoin('event.participants', 'participant')
+      .where('participant.id = :userId', { userId })
+      .andWhere('event.dateTime < :now', { now: new Date() })
+      .leftJoinAndSelect('event.tags', 'tag')
+      .getMany();
+    return [
+      ...new Set(
+        attendedEvents.flatMap((e) => e.tags?.map((t) => t.name) ?? []),
+      ),
+    ];
+  }
 }
