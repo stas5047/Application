@@ -14,11 +14,11 @@ async function seed(): Promise<void> {
 
   // --- Users ---
   const usersData = [
-    { email: 'alice@example.com',   username: 'alice_dev',    password: 'password1' },
-    { email: 'bob@example.com',     username: 'bob_builds',   password: 'password2' },
-    { email: 'carol@example.com',   username: 'carol_ux',     password: 'password3' },
-    { email: 'dan@example.com',     username: 'dan_ops',      password: 'password4' },
-    { email: 'eve@example.com',     username: 'eve_startup',  password: 'password5' },
+    { email: 'alice@example.com',  username: 'alice_dev',   password: 'password1' }, // tech, education
+    { email: 'bob@example.com',    username: 'bob_builds',  password: 'password2' }, // tech, devops
+    { email: 'carol@example.com',  username: 'carol_ux',    password: 'password3' }, // design, art
+    { email: 'dan@example.com',    username: 'dan_ops',     password: 'password4' }, // health, sports
+    { email: 'eve@example.com',    username: 'eve_startup', password: 'password5' }, // business, music, networking
   ];
 
   const savedUsers: User[] = [];
@@ -43,6 +43,7 @@ async function seed(): Promise<void> {
 
   // --- Events ---
   const eventsData = [
+    // ── PAST (before Mar 12) ──────────────────────────────────────────────────
     {
       title: 'TypeScript Fundamentals',
       description: 'A hands-on intro to TypeScript — types, interfaces, generics.',
@@ -55,7 +56,7 @@ async function seed(): Promise<void> {
     {
       title: 'Docker for Developers',
       description: 'Containerize your apps from zero to production.',
-      dateTime: new Date('2026-03-15T14:00:00Z'),
+      dateTime: new Date('2026-03-08T14:00:00Z'),
       location: 'Tech Hub, Kyiv',
       capacity: 20,
       visibility: EventVisibility.PUBLIC,
@@ -64,56 +65,139 @@ async function seed(): Promise<void> {
     {
       title: 'UX Design Sprint',
       description: 'A 3-hour design sprint — from problem to prototype.',
-      dateTime: new Date('2026-03-22T11:00:00Z'),
+      dateTime: new Date('2026-03-05T11:00:00Z'),
       location: 'Creative Space, Lviv',
       capacity: 15,
       visibility: EventVisibility.PUBLIC,
       organizer: carol,
     },
     {
-      title: 'Private Team Retrospective',
-      description: 'Q1 retrospective for the core team only.',
-      dateTime: new Date('2026-03-28T16:00:00Z'),
-      location: 'Office, Kyiv',
-      capacity: 10,
-      visibility: EventVisibility.PRIVATE,
+      title: 'Jazz Night at Maidan',
+      description: 'Live jazz from three local bands on an open-air stage.',
+      dateTime: new Date('2026-03-03T19:00:00Z'),
+      location: 'Maidan, Kyiv',
+      capacity: null,
+      visibility: EventVisibility.PUBLIC,
+      organizer: eve,
+    },
+    {
+      title: 'Morning Run Club',
+      description: '5 km group run through Holosiivskyi Park followed by stretching.',
+      dateTime: new Date('2026-03-01T08:00:00Z'),
+      location: 'Holosiivskyi Park, Kyiv',
+      capacity: 40,
+      visibility: EventVisibility.PUBLIC,
       organizer: dan,
     },
+
+    // ── FUTURE (after Mar 18) ─────────────────────────────────────────────────
     {
       title: 'NestJS Deep Dive',
       description: 'Advanced NestJS patterns: guards, interceptors, custom decorators.',
-      dateTime: new Date('2026-04-05T18:00:00Z'),
+      dateTime: new Date('2026-03-20T18:00:00Z'),
       location: 'Innovation Center, Kyiv',
       capacity: 50,
       visibility: EventVisibility.PUBLIC,
       organizer: alice,
     },
     {
+      title: 'Brand Identity Workshop',
+      description: 'Build a visual identity from scratch — logo, palette, typography.',
+      dateTime: new Date('2026-03-22T11:00:00Z'),
+      location: 'Creative Space, Lviv',
+      capacity: 20,
+      visibility: EventVisibility.PUBLIC,
+      organizer: carol,
+    },
+    {
+      title: 'Startup Pitch Night',
+      description: 'Present your idea to investors and mentors in a 5-minute pitch format.',
+      dateTime: new Date('2026-03-25T19:00:00Z'),
+      location: 'Startup Campus, Kyiv',
+      capacity: 60,
+      visibility: EventVisibility.PUBLIC,
+      organizer: eve,
+    },
+    {
+      title: 'Yoga & Mindfulness Morning',
+      description: 'Outdoor yoga flow followed by a 20-minute guided meditation session.',
+      dateTime: new Date('2026-03-28T08:30:00Z'),
+      location: 'Botanical Garden, Kyiv',
+      capacity: 25,
+      visibility: EventVisibility.PUBLIC,
+      organizer: dan,
+    },
+    {
       title: 'React Performance Workshop',
       description: 'Memoization, lazy loading, and profiling React apps.',
-      dateTime: new Date('2026-04-12T10:00:00Z'),
+      dateTime: new Date('2026-04-02T10:00:00Z'),
       location: 'Tech Hub, Kyiv',
       capacity: 40,
       visibility: EventVisibility.PUBLIC,
       organizer: alice,
     },
     {
-      title: 'Startup Networking Evening',
-      description: 'Connect with founders and investors over drinks.',
-      dateTime: new Date('2026-04-20T19:00:00Z'),
-      location: 'Startup Campus, Kyiv',
-      capacity: null,
+      title: 'Electronic Music Production Masterclass',
+      description: 'From DAW basics to sound design and mixing in Ableton Live.',
+      dateTime: new Date('2026-04-05T14:00:00Z'),
+      location: 'Sound Studio, Kyiv',
+      capacity: 15,
       visibility: EventVisibility.PUBLIC,
       organizer: eve,
     },
     {
+      title: 'Illustration for Product Designers',
+      description: 'Techniques for creating custom icons and hero illustrations for UI.',
+      dateTime: new Date('2026-04-10T12:00:00Z'),
+      location: 'Online (Figma)',
+      capacity: 30,
+      visibility: EventVisibility.PUBLIC,
+      organizer: carol,
+    },
+    {
       title: 'PostgreSQL & TypeORM Masterclass',
       description: 'Migrations, relations, query optimization with TypeORM.',
-      dateTime: new Date('2026-04-27T14:00:00Z'),
+      dateTime: new Date('2026-04-15T14:00:00Z'),
       location: 'Online (Google Meet)',
       capacity: 60,
       visibility: EventVisibility.PUBLIC,
       organizer: bob,
+    },
+    {
+      title: 'Investor Relations Bootcamp',
+      description: 'How to talk to VCs: decks, due diligence, and term sheets explained.',
+      dateTime: new Date('2026-04-18T10:00:00Z'),
+      location: 'Business Hub, Kyiv',
+      capacity: 35,
+      visibility: EventVisibility.PUBLIC,
+      organizer: eve,
+    },
+    {
+      title: 'Trail Running & Nutrition',
+      description: 'Technique clinic on trail running followed by a workshop on race-day nutrition.',
+      dateTime: new Date('2026-04-22T09:00:00Z'),
+      location: 'Syrets Park, Kyiv',
+      capacity: 30,
+      visibility: EventVisibility.PUBLIC,
+      organizer: dan,
+    },
+    {
+      title: 'CI/CD Pipelines with GitHub Actions',
+      description: 'Build, test, and deploy automatically using GitHub Actions.',
+      dateTime: new Date('2026-04-27T10:00:00Z'),
+      location: 'Online (Zoom)',
+      capacity: 100,
+      visibility: EventVisibility.PUBLIC,
+      organizer: bob,
+    },
+    {
+      title: 'Open Mic Night',
+      description: 'Acoustic performances — singers, poets, stand-up comedians all welcome.',
+      dateTime: new Date('2026-05-03T19:00:00Z'),
+      location: 'Culture Hub, Kyiv',
+      capacity: null,
+      visibility: EventVisibility.PUBLIC,
+      organizer: eve,
     },
     {
       title: 'Workshop at Full Capacity',
@@ -125,22 +209,22 @@ async function seed(): Promise<void> {
       organizer: carol,
     },
     {
-      title: 'CI/CD Pipelines with GitHub Actions',
-      description: 'Build, test, and deploy automatically using GitHub Actions.',
-      dateTime: new Date('2026-05-18T10:00:00Z'),
-      location: 'Online (Zoom)',
-      capacity: 100,
-      visibility: EventVisibility.PUBLIC,
-      organizer: dan,
-    },
-    {
       title: 'Product Demo Day',
       description: 'Teams present their Q2 builds. Open to all.',
-      dateTime: new Date('2026-05-28T15:00:00Z'),
+      dateTime: new Date('2026-05-15T15:00:00Z'),
       location: 'Main Stage, Kyiv',
       capacity: 200,
       visibility: EventVisibility.PUBLIC,
       organizer: eve,
+    },
+    {
+      title: 'Private Team Retrospective',
+      description: 'Q2 retrospective for the core team only.',
+      dateTime: new Date('2026-05-20T16:00:00Z'),
+      location: 'Office, Kyiv',
+      capacity: 10,
+      visibility: EventVisibility.PRIVATE,
+      organizer: bob,
     },
   ];
 
@@ -159,6 +243,29 @@ async function seed(): Promise<void> {
     }
     savedEvents.push(event);
   }
+
+  const [
+    evTypescript,   // 0  past    alice
+    evDocker,       // 1  past    bob
+    evUx,           // 2  past    carol
+    evJazz,         // 3  past    eve
+    evRun,          // 4  past    dan
+    evNest,         // 5  future  alice
+    evBrand,        // 6  future  carol
+    evPitch,        // 7  future  eve
+    evYoga,         // 8  future  dan
+    evReact,        // 9  future  alice
+    evElectronic,   // 10 future  eve
+    evIllustration, // 11 future  carol
+    evPg,           // 12 future  bob
+    evInvestor,     // 13 future  eve
+    evTrail,        // 14 future  dan
+    evCicd,         // 15 future  bob
+    evOpenMic,      // 16 future  eve
+    evFull,         // 17 future  carol
+    evDemo,         // 18 future  eve
+    evRetro,        // 19 future  bob (private)
+  ] = savedEvents;
 
   // --- Tags ---
   const tagNames = [
@@ -179,76 +286,28 @@ async function seed(): Promise<void> {
     savedTags[name] = tag;
   }
 
-  const [
-    evTypescript,   // 0  organizer: alice (Mar 10)
-    evDocker,       // 1  organizer: bob   (Mar 15)
-    evUx,           // 2  organizer: carol (Mar 22)
-    evRetro,        // 3  organizer: dan   (Mar 28, private)
-    evNest,         // 4  organizer: alice (Apr 5)
-    evReact,        // 5  organizer: alice (Apr 12)
-    evNetworking,   // 6  organizer: eve   (Apr 20, unlimited)
-    evPg,           // 7  organizer: bob   (Apr 27)
-    evFull,         // 8  organizer: carol (May 8, full 3/3)
-    evCicd,         // 9  organizer: dan   (May 18)
-    evDemo,         // 10 organizer: eve   (May 28)
-  ] = savedEvents;
-
-  // --- Participants ---
-  // Format: [event, [...users to add]] — organizer is always first to mirror EventsService.create() behaviour
-  const participations: [Event, User[]][] = [
-    [evTypescript,  [alice, bob, carol, dan, eve]],   // alice = organizer (5/30)
-    [evDocker,      [bob, alice, carol, dan]],         // bob   = organizer (4/20)
-    [evUx,          [carol, alice, bob, dan, eve]],   // carol = organizer (5/15)
-    [evRetro,       [dan, alice, carol]],              // dan   = organizer (3/10, private)
-    [evNest,        [alice, bob, carol, dan, eve]],   // alice = organizer (5/50)
-    [evReact,       [alice, bob, carol, eve]],         // alice = organizer (4/40)
-    [evNetworking,  [eve, alice, bob, carol, dan]],   // eve   = organizer (5/unlimited)
-    [evPg,          [bob, alice, carol, eve]],         // bob   = organizer (4/60)
-    [evFull,        [carol, alice, bob]],              // carol = organizer (3/3, FULL)
-    [evCicd,        [dan, alice, bob, eve]],           // dan   = organizer (4/100)
-    [evDemo,        [eve, alice, bob, carol, dan]],   // eve   = organizer (5/200)
-  ];
-
-  for (const [event, users] of participations) {
-    const freshEvent = await eventRepo.findOne({
-      where: { id: event.id },
-      relations: ['participants'],
-    });
-    if (!freshEvent) continue;
-
-    let changed = false;
-    for (const user of users) {
-      if (!user?.id || freshEvent.participants.some((p) => p.id === user.id)) continue;
-      // skip dummy placeholders (used only for capacity fill visual)
-      try {
-        const realUser = await userRepo.findOneBy({ id: user.id });
-        if (!realUser) continue;
-        freshEvent.participants.push(realUser);
-        changed = true;
-      } catch {
-        continue;
-      }
-    }
-
-    if (changed) {
-      await eventRepo.save(freshEvent);
-      console.log(`Updated participants for: ${freshEvent.title}`);
-    }
-  }
-
   // --- Tag Assignments ---
   const tagAssignments: [Event, string[]][] = [
-    [evTypescript,  ['tech', 'education']],
-    [evDocker,      ['tech', 'devops']],
-    [evUx,          ['design', 'art']],
-    [evRetro,       ['business']],
-    [evNest,        ['tech', 'education']],
-    [evReact,       ['tech']],
-    [evNetworking,  ['networking', 'business']],
-    [evPg,          ['tech', 'education']],
-    [evFull,        ['education']],
-    [evCicd,        ['tech', 'devops']],
-    [evDemo,        ['business', 'networking']],
+    [evTypescript,   ['tech', 'education']],
+    [evDocker,       ['tech', 'devops', 'education']],
+    [evUx,           ['design', 'art', 'education']],
+    [evJazz,         ['music', 'art']],
+    [evRun,          ['sports', 'health']],
+    [evNest,         ['tech', 'education', 'devops']],
+    [evBrand,        ['design', 'art', 'business']],
+    [evPitch,        ['business', 'networking', 'education']],
+    [evYoga,         ['health', 'sports']],
+    [evReact,        ['tech', 'education']],
+    [evElectronic,   ['music', 'art', 'education']],
+    [evIllustration, ['design', 'art', 'education']],
+    [evPg,           ['tech', 'devops', 'education']],
+    [evInvestor,     ['business', 'networking', 'education']],
+    [evTrail,        ['sports', 'health', 'education']],
+    [evCicd,         ['tech', 'devops']],
+    [evOpenMic,      ['music', 'art', 'networking']],
+    [evFull,         ['education', 'design']],
+    [evDemo,         ['business', 'networking', 'tech']],
+    [evRetro,        ['business']],
   ];
 
   for (const [event, names] of tagAssignments) {
@@ -270,6 +329,69 @@ async function seed(): Promise<void> {
     if (changed) {
       await eventRepo.save(freshEvent);
       console.log(`Updated tags for: ${freshEvent.title}`);
+    }
+  }
+
+  // --- Participants ---
+  // User profiles:
+  //   alice   → tech, education         (joins tech/education events)
+  //   bob     → tech, devops            (joins devops/tech events)
+  //   carol   → design, art             (joins design/art events)
+  //   dan     → health, sports          (joins health/sports events)
+  //   eve     → business, music         (joins business/music/networking events)
+  const participations: [Event, User[]][] = [
+    // past
+    [evTypescript,   [alice, bob, carol, dan, eve]],
+    [evDocker,       [bob, alice, dan]],
+    [evUx,           [carol, alice, eve]],
+    [evJazz,         [eve, carol, dan]],
+    [evRun,          [dan, bob, eve]],
+    // future — tech / devops
+    [evNest,         [alice, bob, carol]],
+    [evReact,        [alice, bob, dan]],
+    [evPg,           [bob, alice, eve]],
+    [evCicd,         [bob, dan]],
+    // future — design / art
+    [evBrand,        [carol, alice, eve]],
+    [evIllustration, [carol, alice]],
+    [evFull,         [carol, alice, bob]],       // full 3/3
+    // future — business / networking
+    [evPitch,        [eve, carol, bob]],
+    [evInvestor,     [eve, alice, dan]],
+    [evDemo,         [eve, alice, bob, carol, dan]],
+    // future — music / art
+    [evElectronic,   [eve, carol, alice]],
+    [evOpenMic,      [eve, carol, dan]],
+    // future — health / sports
+    [evYoga,         [dan, carol, alice]],
+    [evTrail,        [dan, bob, eve]],
+    // private
+    [evRetro,        [bob, alice, carol]],
+  ];
+
+  for (const [event, users] of participations) {
+    const freshEvent = await eventRepo.findOne({
+      where: { id: event.id },
+      relations: ['participants'],
+    });
+    if (!freshEvent) continue;
+
+    let changed = false;
+    for (const user of users) {
+      if (!user?.id || freshEvent.participants.some((p) => p.id === user.id)) continue;
+      try {
+        const realUser = await userRepo.findOneBy({ id: user.id });
+        if (!realUser) continue;
+        freshEvent.participants.push(realUser);
+        changed = true;
+      } catch {
+        continue;
+      }
+    }
+
+    if (changed) {
+      await eventRepo.save(freshEvent);
+      console.log(`Updated participants for: ${freshEvent.title}`);
     }
   }
 
