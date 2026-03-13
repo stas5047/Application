@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { CalendarDays, CalendarRange, LogOut, Menu, User, X } from 'lucide-react';
+import { CalendarDays, CalendarRange, LogOut, Menu, MessageSquare, User, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
@@ -60,6 +60,14 @@ export default function Navbar() {
                   <span className="flex items-center gap-1.5">
                     <CalendarRange className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
                     My Events
+                  </span>
+                )}
+              </NavLink>
+              <NavLink to="/assistant" className={navLinkClass}>
+                {({ isActive }) => (
+                  <span className="flex items-center gap-1.5">
+                    <MessageSquare className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                    AI Assistant
                   </span>
                 )}
               </NavLink>
@@ -139,6 +147,14 @@ export default function Navbar() {
               <span className="flex items-center gap-2">
                 <CalendarRange className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
                 My Events
+              </span>
+            )}
+          </NavLink>
+          <NavLink to="/assistant" className={navLinkClass} onClick={closeMenu}>
+            {({ isActive }) => (
+              <span className="flex items-center gap-2">
+                <MessageSquare className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                AI Assistant
               </span>
             )}
           </NavLink>
