@@ -23,6 +23,9 @@ interface GroqChatResponse {
 
 @Injectable()
 export class AssistantService {
+  private static readonly FALLBACK_MESSAGE =
+    "Sorry, I didn't understand that. Please try rephrasing your question.";
+
   constructor(
     @InjectRepository(Event)
     private readonly eventRepo: Repository<Event>,
@@ -88,6 +91,8 @@ export class AssistantService {
       { role: 'user', content: question },
     ];
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
     try {
       const apiKey = this.configService.get<string>('GROQ_API_KEY') ?? '';
       const response = await fetch(
@@ -104,17 +109,23 @@ export class AssistantService {
             temperature: 0.3,
             max_tokens: 800,
           }),
+          signal: controller.signal,
         },
       );
 
       if (!response.ok) {
-        return "Sorry, I didn't understand that. Please try rephrasing your question.";
+        return AssistantService.FALLBACK_MESSAGE;
       }
 
       const data = (await response.json()) as GroqChatResponse;
-      return data.choices[0]?.message?.content ?? "Sorry, I didn't understand that. Please try rephrasing your question.";
+      if (!Array.isArray(data.choices) || data.choices.length === 0) {
+        return AssistantService.FALLBACK_MESSAGE;
+      }
+      return data.choices[0]?.message?.content ?? AssistantService.FALLBACK_MESSAGE;
     } catch {
-      return "Sorry, I didn't understand that. Please try rephrasing your question.";
+      return AssistantService.FALLBACK_MESSAGE;
+    } finally {
+      clearTimeout(timeout);
     }
   }
 }

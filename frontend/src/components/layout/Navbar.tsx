@@ -45,34 +45,36 @@ export default function Navbar() {
             EventHub
           </Link>
 
-          {isAuthenticated && (
-            <div className="hidden sm:flex items-center gap-4">
-              <NavLink to="/events" end className={navLinkClass}>
-                {({ isActive }) => (
-                  <span className="flex items-center gap-1.5">
-                    <CalendarDays className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
-                    Events
-                  </span>
-                )}
-              </NavLink>
-              <NavLink to="/my-events" className={navLinkClass}>
-                {({ isActive }) => (
-                  <span className="flex items-center gap-1.5">
-                    <CalendarRange className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
-                    My Events
-                  </span>
-                )}
-              </NavLink>
-              <NavLink to="/assistant" className={navLinkClass}>
-                {({ isActive }) => (
-                  <span className="flex items-center gap-1.5">
-                    <MessageSquare className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
-                    AI Assistant
-                  </span>
-                )}
-              </NavLink>
-            </div>
-          )}
+          <div className="hidden sm:flex items-center gap-4">
+            <NavLink to="/events" end className={navLinkClass}>
+              {({ isActive }) => (
+                <span className="flex items-center gap-1.5">
+                  <CalendarDays className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                  Events
+                </span>
+              )}
+            </NavLink>
+            {isAuthenticated && (
+              <>
+                <NavLink to="/my-events" className={navLinkClass}>
+                  {({ isActive }) => (
+                    <span className="flex items-center gap-1.5">
+                      <CalendarRange className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                      My Events
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink to="/assistant" className={navLinkClass}>
+                  {({ isActive }) => (
+                    <span className="flex items-center gap-1.5">
+                      <MessageSquare className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                      AI Assistant
+                    </span>
+                  )}
+                </NavLink>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Right side: Desktop actions */}

@@ -36,7 +36,6 @@ export const useEventsStore = create<EventsState>((set) => ({
 
   createEvent: async (data: CreateEventRequest) => {
     const event = await eventsService.create(data);
-    set((state) => ({ events: [...state.events, event] }));
     return event;
   },
 

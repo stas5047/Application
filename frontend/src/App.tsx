@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { FileQuestion } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import { useAuthStore } from '@/store/auth.store';
 import { PageLoader } from '@/components/ui/page-loader';
+import { EmptyState } from '@/components/ui/empty-state';
 import AppLayout from '@/components/layout/AppLayout';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
 import LoginPage from '@/features/auth/LoginPage';
@@ -11,14 +13,6 @@ import EventDetailsPage from '@/features/events/EventDetailsPage';
 import EventFormPage from '@/features/events/EventFormPage';
 import MyEventsPage from '@/features/my-events/MyEventsPage';
 import AssistantPage from '@/features/assistant/AssistantPage';
-
-function PlaceholderPage({ label }: { label: string }) {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <p className="text-muted-foreground text-lg">{label}</p>
-    </div>
-  );
-}
 
 export default function App() {
   const isHydrated = useAuthStore((s) => s.isHydrated);
@@ -44,9 +38,18 @@ export default function App() {
             <Route path="/my-events" element={<MyEventsPage />} />
             <Route path="/assistant" element={<AssistantPage />} />
           </Route>
-        </Route>
 
-        <Route path="*" element={<PlaceholderPage label="404 Not Found" />} />
+          <Route
+            path="*"
+            element={
+              <EmptyState
+                icon={FileQuestion}
+                heading="404 Not Found"
+                subText="The page you're looking for doesn't exist."
+              />
+            }
+          />
+        </Route>
       </Routes>
       <Toaster position="top-right" richColors duration={1500} />
     </>

@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
 import { TagsModule } from './tags/tags.module';
 import { AssistantModule } from './assistant/assistant.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -30,11 +32,13 @@ import { AssistantModule } from './assistant/assistant.module';
         synchronize: false,
       }),
     }),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 10 }]),
     UsersModule,
     AuthModule,
     EventsModule,
     TagsModule,
     AssistantModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

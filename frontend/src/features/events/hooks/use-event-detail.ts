@@ -81,6 +81,7 @@ export function useEventDetail(id: string): UseEventDetailResult {
       void navigate('/events');
     } catch {
       // global interceptor fires toast.error
+    } finally {
       setIsDeleting(false);
     }
   };

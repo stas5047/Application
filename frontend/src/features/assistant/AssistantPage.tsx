@@ -58,7 +58,7 @@ export default function AssistantPage() {
             ))}
 
             {isLoading && (
-              <div className="flex justify-start">
+              <div className="flex justify-start" role="status" aria-label="Assistant is typing">
                 <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3">
                   <span className="flex gap-1 items-center">
                     <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:0ms]" />

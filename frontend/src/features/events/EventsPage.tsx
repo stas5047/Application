@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CalendarDays, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -22,12 +22,16 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const filteredEvents = events.filter((e) => {
-    const matchesSearch = e.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTags =
-      selectedTags.length === 0 || e.tags.some((t) => selectedTags.includes(t.name));
-    return matchesSearch && matchesTags;
-  });
+  const filteredEvents = useMemo(
+    () =>
+      events.filter((e) => {
+        const matchesSearch = e.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesTags =
+          selectedTags.length === 0 || e.tags.some((t) => selectedTags.includes(t.name));
+        return matchesSearch && matchesTags;
+      }),
+    [events, searchQuery, selectedTags],
+  );
 
   const pageHeader = (
     <div className="mb-6">

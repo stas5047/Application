@@ -10,8 +10,10 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiTags,
+  ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { AssistantService } from './assistant.service';
@@ -29,10 +31,11 @@ export class AssistantController {
 
   @Post('ask')
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ThrottlerGuard, JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: AssistantResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiTooManyRequestsResponse({ description: 'Rate limit exceeded (10 requests/minute)' })
   async ask(
     @Request() req: RequestWithUser,
     @Body() dto: AskDto,
