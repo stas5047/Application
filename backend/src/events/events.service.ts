@@ -190,48 +190,23 @@ export class EventsService {
   }
 
     async join(id: string, userId: string): Promise<EventDetailResponseDto> {
-      const preCheck = await this.repo.findOne({
-        where: { id },
-        select: { id: true, visibility: true, organizerId: true, dateTime: true },
-      });
-      if (!preCheck) throw new NotFoundException('Event not found');
-      this.assertNotPast(preCheck);
+      const event = await this.findWithParticipantsOrFail(id);
+      this.assertNotPast(event);
       if (
-        preCheck.visibility === EventVisibility.PRIVATE &&
-        preCheck.organizerId !== userId
+        event.visibility === EventVisibility.PRIVATE &&
+        event.organizerId !== userId
       ) {
         throw new ForbiddenException('Cannot join a private event');
       }
-
-      let businessError: Error | null = null;
-
-      await this.repo.manager.transaction(async (manager) => {
-        const event = await manager.findOne(Event, {
-          where: { id },
-          relations: { participants: true },
-          lock: { mode: 'pessimistic_write' },
-        });
-        if (!event) {
-          businessError = new NotFoundException('Event not found');
-          return;
-        }
-        if (event.participants.some((p) => p.id === userId)) {
-          businessError = new ConflictException('You have already joined this event');
-          return;
-        }
-        if (event.capacity !== null && event.participants.length >= event.capacity) {
-          businessError = new ConflictException('Event is at full capacity');
-          return;
-        }
-        await manager
-          .createQueryBuilder()
-          .relation(Event, 'participants')
-          .of(id)
-          .add(userId);
-      });
-
-      if (businessError) throw businessError;
-
+      if (event.participants.some((p) => p.id === userId))
+        throw new ConflictException('You have already joined this event');
+      if (event.capacity !== null && event.participants.length >= event.capacity)
+        throw new ConflictException('Event is at full capacity');
+      await this.repo
+        .createQueryBuilder()
+        .relation(Event, 'participants')
+        .of(id)
+        .add(userId);
       return this.findOne(id, userId);
     }
 
