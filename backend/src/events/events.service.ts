@@ -94,6 +94,13 @@ export class EventsService {
       relations: { organizer: true, participants: true, tags: true },
     });
     if (!event) throw new NotFoundException('Event not found');
+    if (event.visibility === EventVisibility.PRIVATE) {
+      const isParticipant =
+        userId && event.participants.some((p) => p.id === userId);
+      if (event.organizerId !== userId && !isParticipant) {
+        throw new NotFoundException('Event not found');
+      }
+    }
     const isJoined = userId
       ? event.participants.some((p) => p.id === userId)
       : false;
@@ -182,20 +189,51 @@ export class EventsService {
     await this.repo.remove(event);
   }
 
-  async join(id: string, userId: string): Promise<EventDetailResponseDto> {
-    const event = await this.findWithParticipantsOrFail(id);
-    this.assertNotPast(event);
-    if (event.participants.some((p) => p.id === userId))
-      throw new ConflictException('You have already joined this event');
-    if (event.capacity !== null && event.participants.length >= event.capacity)
-      throw new ConflictException('Event is at full capacity');
-    await this.repo
-      .createQueryBuilder()
-      .relation(Event, 'participants')
-      .of(id)
-      .add(userId);
-    return this.findOne(id, userId);
-  }
+    async join(id: string, userId: string): Promise<EventDetailResponseDto> {
+      const preCheck = await this.repo.findOne({
+        where: { id },
+        select: { id: true, visibility: true, organizerId: true, dateTime: true },
+      });
+      if (!preCheck) throw new NotFoundException('Event not found');
+      this.assertNotPast(preCheck);
+      if (
+        preCheck.visibility === EventVisibility.PRIVATE &&
+        preCheck.organizerId !== userId
+      ) {
+        throw new ForbiddenException('Cannot join a private event');
+      }
+
+      let businessError: Error | null = null;
+
+      await this.repo.manager.transaction(async (manager) => {
+        const event = await manager.findOne(Event, {
+          where: { id },
+          relations: { participants: true },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (!event) {
+          businessError = new NotFoundException('Event not found');
+          return;
+        }
+        if (event.participants.some((p) => p.id === userId)) {
+          businessError = new ConflictException('You have already joined this event');
+          return;
+        }
+        if (event.capacity !== null && event.participants.length >= event.capacity) {
+          businessError = new ConflictException('Event is at full capacity');
+          return;
+        }
+        await manager
+          .createQueryBuilder()
+          .relation(Event, 'participants')
+          .of(id)
+          .add(userId);
+      });
+
+      if (businessError) throw businessError;
+
+      return this.findOne(id, userId);
+    }
 
   async leave(id: string, userId: string): Promise<EventDetailResponseDto> {
     const event = await this.findWithParticipantsOrFail(id);

@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -41,6 +42,7 @@ export class CreateEventDto {
   @IsOptional()
   @IsInt()
   @Min(1)
+  @Max(100000)
   capacity?: number;
 
   @ApiPropertyOptional({ enum: EventVisibility })
