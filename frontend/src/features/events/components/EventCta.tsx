@@ -10,6 +10,7 @@ interface EventCtaProps {
   isAuthenticated: boolean;
   isInFlight: boolean;
   isOrganizer?: boolean;
+  isPast?: boolean;
   onJoin: (id: string) => void;
   onLeave: (id: string) => void;
 }
@@ -22,12 +23,21 @@ export function EventCta({
   isAuthenticated,
   isInFlight,
   isOrganizer,
+  isPast,
   onJoin,
   onLeave,
 }: EventCtaProps) {
   const navigate = useNavigate();
 
   const isFull = capacity !== null && participantCount >= capacity;
+
+  if (isPast) {
+    return (
+      <Button disabled variant="outline" onClick={(e) => e.stopPropagation()}>
+        Event ended
+      </Button>
+    );
+  }
 
   if (isFull && !isJoined) {
     return (

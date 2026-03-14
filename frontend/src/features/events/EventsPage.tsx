@@ -11,6 +11,7 @@ import { EventCardSkeleton } from './components/EventCardSkeleton';
 import { EventCta } from './components/EventCta';
 import { TagFilter } from './components/TagFilter';
 import { useEventActions } from './hooks/useEventActions';
+import { isPastEvent } from '@/lib/date-utils';
 
 export default function EventsPage() {
   const navigate = useNavigate();
@@ -24,12 +25,19 @@ export default function EventsPage() {
 
   const filteredEvents = useMemo(
     () =>
-      events.filter((e) => {
-        const matchesSearch = e.title.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesTags =
-          selectedTags.length === 0 || e.tags.some((t) => selectedTags.includes(t.name));
-        return matchesSearch && matchesTags;
-      }),
+      events
+        .filter((e) => {
+          const matchesSearch = e.title.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesTags =
+            selectedTags.length === 0 || e.tags.some((t) => selectedTags.includes(t.name));
+          return matchesSearch && matchesTags;
+        })
+        .sort((a, b) => {
+          const aPast = isPastEvent(a.dateTime);
+          const bPast = isPastEvent(b.dateTime);
+          if (aPast !== bPast) return aPast ? 1 : -1;
+          return new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
+        }),
     [events, searchQuery, selectedTags],
   );
 
@@ -100,34 +108,40 @@ export default function EventsPage() {
         />
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredEvents.map((e) => (
-            <EventCard
-              key={e.id}
-              id={e.id}
-              title={e.title}
-              description={e.description}
-              dateTime={e.dateTime}
-              location={e.location}
-              capacity={e.capacity}
-              participantCount={e.participantCount}
-              isOrganizer={!!userId && e.organizerId === userId}
-              tags={e.tags}
-              onClick={() => void navigate(`/events/${e.id}`)}
-              cta={
-                <EventCta
-                  eventId={e.id}
-                  capacity={e.capacity}
-                  participantCount={e.participantCount}
-                  isJoined={e.isJoined}
-                  isAuthenticated={isAuthenticated}
-                  isInFlight={loadingIds.has(e.id)}
-                  isOrganizer={!!userId && e.organizerId === userId}
-                  onJoin={(id) => void handleJoin(id)}
-                  onLeave={(id) => void handleLeave(id)}
-                />
-              }
-            />
-          ))}
+          {filteredEvents.map((e) => {
+            const past = isPastEvent(e.dateTime);
+            const isOrganizer = !!userId && e.organizerId === userId;
+            return (
+              <EventCard
+                key={e.id}
+                id={e.id}
+                title={e.title}
+                description={e.description}
+                dateTime={e.dateTime}
+                location={e.location}
+                capacity={e.capacity}
+                participantCount={e.participantCount}
+                isOrganizer={isOrganizer}
+                isPast={past}
+                tags={e.tags}
+                onClick={!past || isOrganizer ? () => void navigate(`/events/${e.id}`) : undefined}
+                cta={
+                  <EventCta
+                    eventId={e.id}
+                    capacity={e.capacity}
+                    participantCount={e.participantCount}
+                    isJoined={e.isJoined}
+                    isAuthenticated={isAuthenticated}
+                    isInFlight={loadingIds.has(e.id)}
+                    isOrganizer={isOrganizer}
+                    isPast={past}
+                    onJoin={(id) => void handleJoin(id)}
+                    onLeave={(id) => void handleLeave(id)}
+                  />
+                }
+              />
+            );
+          })}
         </div>
       )}
     </div>

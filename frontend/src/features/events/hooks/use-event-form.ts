@@ -3,6 +3,7 @@ import { useForm, type UseFormReturn, type Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { isPastEvent } from '@/lib/date-utils';
 import { eventSchema, type EventFormValues } from '@/features/events/schemas/event.schemas';
 import { eventsService } from '@/services/events.service';
 import { useEventsStore } from '@/store/events.store';
@@ -53,6 +54,11 @@ export function useEventForm({ id }: UseEventFormOptions): UseEventFormResult {
       .then((event) => {
         if (cancelled) return;
         if (event.organizerId !== user?.id) {
+          void navigate('/events', { replace: true });
+          return;
+        }
+        if (isPastEvent(event.dateTime)) {
+          toast.info('Past events cannot be edited.');
           void navigate('/events', { replace: true });
           return;
         }
