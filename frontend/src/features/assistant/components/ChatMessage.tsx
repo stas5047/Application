@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown';
+
 export interface ChatMessageItem {
   role: 'user' | 'assistant';
   content: string;
@@ -18,7 +20,13 @@ export default function ChatMessage({ role, content }: ChatMessageProps) {
             : 'rounded-bl-sm bg-muted text-foreground'
         }`}
       >
-        {content}
+        {role === 'assistant' ? (
+          <div className="prose prose-sm max-w-none dark:prose-invert [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+            <ReactMarkdown>{content}</ReactMarkdown>
+          </div>
+        ) : (
+          content
+        )}
       </div>
     </div>
   );

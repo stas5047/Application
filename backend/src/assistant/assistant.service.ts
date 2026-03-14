@@ -47,11 +47,12 @@ export class AssistantService {
         .createQueryBuilder('event')
         .leftJoinAndSelect('event.tags', 'tag')
         .leftJoinAndSelect('event.participants', 'participant')
+        .leftJoinAndSelect('event.organizer', 'organizer')
         .where('event.visibility = :visibility', {
           visibility: EventVisibility.PUBLIC,
         })
         .orderBy('event.dateTime', 'ASC')
-        .take(50)
+        .take(30)
         .getMany(),
     ]);
 
@@ -60,7 +61,9 @@ export class AssistantService {
       dateTime: event.dateTime,
       location: event.location,
       tags: event.tags.map((t) => t.name),
-      participantCount: event.participants.length,
+      capacity: event.capacity,
+      visibility: event.visibility,
+      participants: event.participants.map((p) => p.username),
       role: event.organizerId === userId ? 'organizer' : 'participant',
     }));
 
@@ -69,7 +72,9 @@ export class AssistantService {
       dateTime: event.dateTime,
       location: event.location,
       tags: event.tags.map((t) => t.name),
-      participantCount: event.participants.length,
+      capacity: event.capacity,
+      organizer: event.organizer?.username,
+      participants: event.participants.map((p) => p.username),
     }));
 
     const today = new Date().toISOString().split('T')[0];
@@ -120,7 +125,7 @@ export class AssistantService {
       if (!Array.isArray(data.choices) || data.choices.length === 0) {
         return AssistantService.FALLBACK_MESSAGE;
       }
-      return data.choices[0]?.message?.content ?? AssistantService.FALLBACK_MESSAGE;
+      return data.choices[0]?.message?.content || AssistantService.FALLBACK_MESSAGE;
     } catch {
       return AssistantService.FALLBACK_MESSAGE;
     } finally {
