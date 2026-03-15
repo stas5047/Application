@@ -48,7 +48,7 @@ export function TagFilter({ selectedTags, onTagsChange }: TagFilterProps) {
               )}
               onClick={() => toggleTag(tag.name)}
             >
-              {tag.name}
+              {tag.name.charAt(0).toUpperCase() + tag.name.slice(1)}
             </Badge>
           );
         })}

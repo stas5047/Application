@@ -162,20 +162,27 @@ export default function EventFormPage() {
               name="visibility"
               control={control}
               render={({ field }) => (
-                <RadioGroup
-                  value={field.value ?? 'public'}
-                  onValueChange={field.onChange}
-                  className="flex flex-row gap-6"
-                >
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem id="vis-public" value="public" disabled={isSubmitting} />
-                    <Label htmlFor="vis-public" className="font-normal cursor-pointer">Public</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem id="vis-private" value="private" disabled={isSubmitting} />
-                    <Label htmlFor="vis-private" className="font-normal cursor-pointer">Private</Label>
-                  </div>
-                </RadioGroup>
+                <>
+                  <RadioGroup
+                    value={field.value ?? 'public'}
+                    onValueChange={field.onChange}
+                    className="flex flex-row gap-6"
+                  >
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem id="vis-public" value="public" disabled={isSubmitting} />
+                      <Label htmlFor="vis-public" className="font-normal cursor-pointer">Public</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem id="vis-private" value="private" disabled={isSubmitting} />
+                      <Label htmlFor="vis-private" className="font-normal cursor-pointer">Private</Label>
+                    </div>
+                  </RadioGroup>
+                  <p className="text-xs text-muted-foreground">
+                    {(field.value ?? 'public') === 'public'
+                      ? 'Anyone can see and join this event.'
+                      : 'Only those invited (via link) can view this event.'}
+                  </p>
+                </>
               )}
             />
           </div>
