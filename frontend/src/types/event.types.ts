@@ -38,10 +38,10 @@ export interface EventDetailResponse extends EventSummaryResponse {
 
 export interface CreateEventRequest {
   title: string;
-  description?: string;
+  description?: string | null;
   dateTime: string;
   location: string;
-  capacity?: number;
+  capacity?: number | null;
   visibility?: EventVisibility;
   tagNames?: string[];
 }

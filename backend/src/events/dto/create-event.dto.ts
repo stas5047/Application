@@ -25,7 +25,7 @@ export class CreateEventDto {
   @IsOptional()
   @IsString()
   @MaxLength(2000)
-  description?: string;
+  description?: string | null;
 
   @ApiProperty()
   @IsISO8601()
@@ -43,7 +43,7 @@ export class CreateEventDto {
   @IsInt()
   @Min(1)
   @Max(100000)
-  capacity?: number;
+  capacity?: number | null;
 
   @ApiPropertyOptional({ enum: EventVisibility })
   @IsOptional()

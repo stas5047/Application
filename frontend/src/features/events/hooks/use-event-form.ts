@@ -88,9 +88,9 @@ export function useEventForm({ id }: UseEventFormOptions): UseEventFormResult {
     const payload = {
       ...values,
       dateTime: values.dateTime.toISOString(),
-      capacity: values.capacity ?? undefined,
-      description: values.description || undefined,
-      tagNames: values.tagNames?.length ? values.tagNames : undefined,
+      capacity: values.capacity ?? null,
+      description: values.description || null,
+      tagNames: values.tagNames ?? [],
     };
     try {
       if (isEditMode) {
