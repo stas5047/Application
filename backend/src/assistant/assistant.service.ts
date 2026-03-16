@@ -38,8 +38,6 @@ export class AssistantService {
 
   async ask(userId: string, question: string): Promise<string> {
     const [userEventsRaw, publicEventsRaw, currentUser] = await Promise.all([
-      // Bug #3 fix: use QueryBuilder with a separate innerJoin for filtering
-      // so the participants relation is not filtered — all participants are loaded
       this.eventRepo
         .createQueryBuilder('event')
         .leftJoinAndSelect('event.organizer', 'organizer')
@@ -59,11 +57,9 @@ export class AssistantService {
         .orderBy('event.dateTime', 'ASC')
         .take(30)
         .getMany(),
-      // Bug #7 fix: fetch current user to include identity in context
       this.userRepo.findOneBy({ id: userId }),
     ]);
 
-    // Bug #4 fix: exclude events already in userEvents from public events
     const userEventIds = new Set(userEventsRaw.map((e) => e.id));
     const publicOnlyEventsRaw = publicEventsRaw.filter(
       (e) => !userEventIds.has(e.id),
@@ -76,10 +72,7 @@ export class AssistantService {
       tags: event.tags.map((t) => t.name),
       capacity: event.capacity,
       participantCount: event.participants.length,
-      participantUsernames: event.participants
-        .map((p: any) => p.username || p.user?.username)
-        .filter(Boolean),
-      // Bug #5 fix: restore visibility field so AI can distinguish public/private
+      participantUsernames: event.participants.map((p: User) => p.username),
       visibility: event.visibility,
       role: event.organizerId === userId ? 'organizer' : 'participant',
     }));
@@ -92,16 +85,13 @@ export class AssistantService {
       capacity: event.capacity,
       organizer: event.organizer?.username,
       participantCount: event.participants.length,
-      participantUsernames: event.participants
-        .map((p: any) => p.username || p.user?.username)
-        .filter(Boolean),
+      participantUsernames: event.participants.map((p: User) => p.username),
     }));
 
     const today = new Date().toISOString().split('T')[0];
     const now = new Date();
 
     const context = JSON.stringify({
-      // Bug #7 fix: include current user identity so AI never asks for username
       currentUser: {
         id: userId,
         username: currentUser?.username ?? 'unknown',
