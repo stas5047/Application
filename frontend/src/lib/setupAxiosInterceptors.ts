@@ -67,6 +67,16 @@ export function setupAxiosInterceptors(getAuthState: () => AuthAccessor): void {
         }
       }
 
+      if (status === 429) {
+        const responseData = error.response?.data as Record<string, unknown> | undefined;
+        const msg =
+          typeof responseData?.message === 'string'
+            ? responseData.message
+            : 'Rate limit exceeded (4 requests/minute)';
+        toast.error(msg);
+        return Promise.reject(error);
+      }
+
       if (status && status >= 400) {
         const responseData = error.response?.data as Record<string, unknown> | undefined;
         const message =

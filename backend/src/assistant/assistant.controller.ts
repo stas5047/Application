@@ -31,13 +31,13 @@ export class AssistantController {
 
   @Post('ask')
   @HttpCode(200)
-  @Throttle({ default: { ttl: 60_000, limit: 3 } })
+  @Throttle({ default: { ttl: 60_000, limit: 4 } })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: AssistantResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiTooManyRequestsResponse({
-    description: 'Rate limit exceeded (3 requests/minute)',
+    description: 'Rate limit exceeded (4 requests/minute)',
   })
   async ask(
     @Request() req: RequestWithUser,
