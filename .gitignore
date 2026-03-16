@@ -5,6 +5,7 @@ node_modules/
 dist/
 dist-ssr/
 build/
+storybook-static/
 *.js.map
 
 # Environment variables
