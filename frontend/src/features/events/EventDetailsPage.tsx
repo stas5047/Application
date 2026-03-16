@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 import { AlertCircle, ArrowLeft, CalendarDays, MapPin, Pencil, Trash2, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getTagColor } from '@/lib/tag-colors';
+import { isPastEvent } from '@/lib/date-utils';
 import { useAuthStore } from '@/store/auth.store';
 import { useEventDetail } from '@/features/events/hooks/use-event-detail';
 import { EventCta } from '@/features/events/components/EventCta';
@@ -58,6 +61,13 @@ export default function EventDetailsPage() {
     handleDelete,
   } = useEventDetail(id ?? '');
 
+  useEffect(() => {
+    if (!isLoading && event && isPastEvent(event.dateTime) && user?.id !== event.organizerId) {
+      toast.info('This event has already ended.');
+      void navigate('/events', { replace: true });
+    }
+  }, [event, isLoading, user?.id, navigate]);
+
   if (isLoading) {
     return <EventDetailSkeleton />;
   }
@@ -75,6 +85,9 @@ export default function EventDetailsPage() {
   }
 
   const isOrganizer = user?.id === event.organizerId;
+  const past = isPastEvent(event.dateTime);
+
+  if (past && !isOrganizer) return null;
   const formattedDate = format(new Date(event.dateTime), "MMM d, yyyy 'at' h:mm a");
   const capacityText =
     event.capacity !== null
@@ -90,25 +103,33 @@ export default function EventDetailsPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => void navigate('/events')}
+              onClick={() => {
+                if (window.history.state?.idx > 0) navigate(-1);
+                else void navigate('/events');
+              }}
               className="gap-1"
             >
               <ArrowLeft className="size-4" />
               Back
             </Button>
             <h1 className="text-2xl font-bold">{event.title}</h1>
+            {past && (
+              <Badge variant="secondary">Past event</Badge>
+            )}
           </div>
           {isOrganizer && (
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void navigate(`/events/${event.id}/edit`)}
-                className="gap-1"
-              >
-                <Pencil className="size-4" />
-                Edit
-              </Button>
+              {!past && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void navigate(`/events/${event.id}/edit`)}
+                  className="gap-1"
+                >
+                  <Pencil className="size-4" />
+                  Edit
+                </Button>
+              )}
               <Button
                 variant="destructive"
                 size="sm"
@@ -166,6 +187,7 @@ export default function EventDetailsPage() {
               isAuthenticated={isAuthenticated}
               isInFlight={isInFlight}
               isOrganizer={isOrganizer}
+              isPast={past}
               onJoin={() => void handleJoin()}
               onLeave={() => void handleLeave()}
             />

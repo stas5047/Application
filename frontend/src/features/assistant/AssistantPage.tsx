@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, SendHorizonal } from 'lucide-react';
-import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import ChatMessage from './components/ChatMessage';
@@ -29,7 +28,7 @@ export default function AssistantPage() {
       const { answer } = await assistantService.ask(question);
       setMessages((prev) => [...prev, { role: 'assistant', content: answer }]);
     } catch {
-      toast.error('Failed to get a response. Please try again.');
+      // Error toast handled by global response interceptor (setupAxiosInterceptors.ts)
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +57,7 @@ export default function AssistantPage() {
             ))}
 
             {isLoading && (
-              <div className="flex justify-start">
+              <div className="flex justify-start" role="status" aria-label="Assistant is typing">
                 <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3">
                   <span className="flex gap-1 items-center">
                     <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:0ms]" />

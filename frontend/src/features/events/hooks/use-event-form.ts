@@ -3,6 +3,7 @@ import { useForm, type UseFormReturn, type Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { isPastEvent } from '@/lib/date-utils';
 import { eventSchema, type EventFormValues } from '@/features/events/schemas/event.schemas';
 import { eventsService } from '@/services/events.service';
 import { useEventsStore } from '@/store/events.store';
@@ -56,6 +57,11 @@ export function useEventForm({ id }: UseEventFormOptions): UseEventFormResult {
           void navigate('/events', { replace: true });
           return;
         }
+        if (isPastEvent(event.dateTime)) {
+          toast.info('Past events cannot be edited.');
+          void navigate('/events', { replace: true });
+          return;
+        }
         reset({
           title: event.title,
           description: event.description ?? '',
@@ -82,9 +88,9 @@ export function useEventForm({ id }: UseEventFormOptions): UseEventFormResult {
     const payload = {
       ...values,
       dateTime: values.dateTime.toISOString(),
-      capacity: values.capacity ?? undefined,
-      description: values.description || undefined,
-      tagNames: values.tagNames?.length ? values.tagNames : undefined,
+      capacity: values.capacity ?? null,
+      description: values.description || null,
+      tagNames: values.tagNames ?? [],
     };
     try {
       if (isEditMode) {

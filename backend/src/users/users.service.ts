@@ -62,6 +62,7 @@ export class UsersService {
         'event.dateTime',
         'event.location',
         'event.organizerId',
+        'event.visibility',
       ])
       .leftJoinAndSelect('event.tags', 'tag')
       .orderBy('event.dateTime', 'ASC')
@@ -73,6 +74,7 @@ export class UsersService {
       dateTime: event.dateTime,
       location: event.location,
       role: event.organizerId === userId ? 'organizer' : 'participant',
+      visibility: event.visibility,
       tags: event.tags.map((t) => ({ id: t.id, name: t.name })),
     }));
   }

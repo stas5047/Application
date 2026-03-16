@@ -1,4 +1,4 @@
-import type { EventRole } from '@/types/event.types';
+import type { EventRole, EventVisibility } from '@/types/event.types';
 
 export interface CalendarEventItem {
   id: string;
@@ -6,5 +6,6 @@ export interface CalendarEventItem {
   start: Date;
   end: Date;
   role: EventRole;
+  visibility: EventVisibility;
   tags?: string[];
 }

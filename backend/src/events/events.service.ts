@@ -29,6 +29,11 @@ export class EventsService {
       throw new BadRequestException('dateTime must be in the future');
   }
 
+  private assertNotPast(event: Event): void {
+    if (new Date(event.dateTime) <= new Date())
+      throw new BadRequestException('Cannot perform this action on a past event');
+  }
+
   private async findEventOrFail(id: string): Promise<Event> {
     const event = await this.repo.findOneBy({ id });
     if (!event) throw new NotFoundException('Event not found');
@@ -89,6 +94,9 @@ export class EventsService {
       relations: { organizer: true, participants: true, tags: true },
     });
     if (!event) throw new NotFoundException('Event not found');
+    if (event.visibility === EventVisibility.PRIVATE && !userId) {
+      throw new NotFoundException('Event not found');
+    }
     const isJoined = userId
       ? event.participants.some((p) => p.id === userId)
       : false;
@@ -152,6 +160,7 @@ export class EventsService {
     if (!event) throw new NotFoundException('Event not found');
     if (event.organizerId !== userId)
       throw new ForbiddenException('Only the organizer can modify this event');
+    this.assertNotPast(event);
     if (dto.dateTime) this.assertFutureDate(dto.dateTime);
 
     const { tagNames, ...scalarFields } = dto;
@@ -178,6 +187,7 @@ export class EventsService {
 
   async join(id: string, userId: string): Promise<EventDetailResponseDto> {
     const event = await this.findWithParticipantsOrFail(id);
+    this.assertNotPast(event);
     if (event.participants.some((p) => p.id === userId))
       throw new ConflictException('You have already joined this event');
     if (event.capacity !== null && event.participants.length >= event.capacity)
@@ -192,6 +202,7 @@ export class EventsService {
 
   async leave(id: string, userId: string): Promise<EventDetailResponseDto> {
     const event = await this.findWithParticipantsOrFail(id);
+    this.assertNotPast(event);
     if (event.organizerId === userId)
       throw new BadRequestException('Organizer cannot leave their own event');
     if (!event.participants.some((p) => p.id === userId))

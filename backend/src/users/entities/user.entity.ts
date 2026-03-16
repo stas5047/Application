@@ -6,6 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Event } from '../../events/entities/event.entity';
 
 @Entity('users')
@@ -14,15 +15,18 @@ export class User {
   id!: string;
 
   @Column({ type: 'varchar', unique: true })
+  @Exclude()
   email!: string;
 
   @Column({ type: 'varchar', unique: true })
   username!: string;
 
   @Column({ type: 'varchar' })
+  @Exclude()
   passwordHash!: string;
 
   @Column({ type: 'varchar', nullable: true })
+  @Exclude()
   refreshTokenHash!: string | null;
 
   @CreateDateColumn({ type: 'timestamptz' })

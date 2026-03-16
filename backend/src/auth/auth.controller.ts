@@ -18,8 +18,10 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Request, Response } from 'express';
 import type { CookieOptions } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -36,13 +38,17 @@ interface RequestWithUser extends Request {
 const REFRESH_COOKIE_NAME = 'refresh_token';
 const REFRESH_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
-  secure: process.env.COOKIE_SECURE === 'true',
+  secure:
+    process.env.COOKIE_SECURE === 'true' ||
+    process.env.NODE_ENV === 'production',
   sameSite: 'lax',
   path: '/api/auth',
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 @ApiTags('Auth')
+@ApiTooManyRequestsResponse({ description: 'Rate limit exceeded' })
+@Throttle({ default: { ttl: 60_000, limit: 5 } })
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

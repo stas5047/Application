@@ -43,7 +43,6 @@ export function useEventActions(): EventActionsResult {
     });
     try {
       await joinEvent(id);
-      await fetchEvents();
       toast.success('You joined the event!');
     } catch {
       // global interceptor fires toast.error
@@ -64,7 +63,6 @@ export function useEventActions(): EventActionsResult {
     });
     try {
       await leaveEvent(id);
-      await fetchEvents();
       toast.success('You left the event.');
     } catch {
       // global interceptor fires toast.error

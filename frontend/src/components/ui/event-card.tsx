@@ -17,6 +17,7 @@ interface EventCardProps {
   capacity: number | null;
   participantCount: number;
   isOrganizer?: boolean;
+  isPast?: boolean;
   tags?: TagResponse[];
   cta: React.ReactNode;
   onClick?: () => void;
@@ -30,6 +31,7 @@ export function EventCard({
   capacity,
   participantCount,
   isOrganizer,
+  isPast,
   tags,
   cta,
   onClick,
@@ -42,6 +44,7 @@ export function EventCard({
     <Card
       className={cn(
         'group flex flex-col transition-all',
+        isPast && 'opacity-60',
         onClick &&
           'cursor-pointer hover:shadow-md hover:border-primary/30 hover:-translate-y-px',
       )}
@@ -60,6 +63,11 @@ export function EventCard({
           {isOrganizer && (
             <span className="inline-flex shrink-0 items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
               Mine
+            </span>
+          )}
+          {isPast && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              Past
             </span>
           )}
         </div>

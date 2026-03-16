@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { addHours, parseISO, startOfDay, isBefore } from 'date-fns';
+import { endOfDay, parseISO } from 'date-fns';
 import type { MyEventResponse } from '@/types/api.types';
 import type { CalendarEventItem } from '@/types/calendar.types';
 import { useEventsStore } from '@/store/events.store';
@@ -10,8 +10,9 @@ function toCalendarEvent(raw: MyEventResponse): CalendarEventItem {
     id: raw.id,
     title: raw.title,
     start,
-    end: addHours(start, 1),
+    end: endOfDay(start),
     role: raw.role,
+    visibility: raw.visibility,
     tags: raw.tags?.map((t) => t.name),
   };
 }
@@ -33,12 +34,7 @@ export function useMyEvents() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, []);
 
-  const calendarEvents = useMemo(() => {
-    const todayStart = startOfDay(new Date());
-    return myEvents
-      .filter(e => !isBefore(parseISO(e.dateTime), todayStart))
-      .map(toCalendarEvent);
-  }, [myEvents]);
+  const calendarEvents = useMemo(() => myEvents.map(toCalendarEvent), [myEvents]);
 
   return { isLoading, isError, calendarEvents, retry: load };
 }
