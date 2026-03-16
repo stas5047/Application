@@ -45,3 +45,6 @@ Thumbs.db
 
 # Local dev
 *.local
+
+# Vite dev server cache
+.vite/
