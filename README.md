@@ -218,6 +218,7 @@ Component library documentation with interactive examples.
 
 ```bash
 cd frontend
+npm install
 npm run storybook
 ```
 

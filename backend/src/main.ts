@@ -30,16 +30,14 @@ async function bootstrap(): Promise<void> {
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  if (configService.get<string>('NODE_ENV') !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('Event Management API')
-      .setDescription('REST API for the Event Management System')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, document);
-  }
+  const config = new DocumentBuilder()
+    .setTitle('Event Management API')
+    .setDescription('REST API for the Event Management System')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
   const port = configService.get<number>('BACKEND_PORT') ?? 3000;
   const logger = new Logger('Bootstrap');
