@@ -1,17 +1,20 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import type { View, EventProps, ToolbarProps } from 'react-big-calendar';
-import { format, parse, getDay, startOfWeek, startOfMonth, startOfDay, isAfter } from 'date-fns';
+import type { View, EventProps } from 'react-big-calendar';
+import { format, parse, getDay, startOfWeek, isBefore, startOfDay } from 'date-fns';
 import { enGB } from 'date-fns/locale/en-GB';
-import { CalendarCheck, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarEvent } from '@/components/ui/calendar-event';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import type { CalendarEventItem } from '@/types/calendar.types';
 import { useMyEvents } from './use-my-events';
+import { CalendarToolbar } from './CalendarToolbar';
+import { MyEventsFilters } from './MyEventsFilters';
+import type { RoleFilter, VisibilityFilter } from './MyEventsFilters';
+import { MyEventsContext } from './my-events.context';
 
 // ADR-F017: dateFnsLocalizer called at module scope — stable reference required by react-big-calendar
 const localizer = dateFnsLocalizer({
@@ -27,115 +30,57 @@ function CalendarEventWrapper({ event }: EventProps<CalendarEventItem>) {
   return <CalendarEvent event={event} />;
 }
 
-// ADR-F017: defined at module scope — stable reference required by react-big-calendar
-const VIEWS: View[] = ['month', 'week', 'agenda'];
-const VIEW_LABELS: Record<string, string> = { month: 'Month', week: 'Week', agenda: 'Agenda' };
-const TODAY_LABEL: Record<string, string> = {
-  month: 'This Month',
-  week: 'This Week',
-  agenda: 'Next 30 Days',
-};
-
-function CalendarToolbar({ label, view, views, date, onNavigate, onView }: ToolbarProps<CalendarEventItem>) {
-  const today = new Date();
-  let isPrevDisabled: boolean;
-  if (view === 'month') {
-    isPrevDisabled = !isAfter(startOfMonth(date), startOfMonth(today));
-  } else if (view === 'week') {
-    isPrevDisabled = !isAfter(startOfWeek(date, { weekStartsOn: 1 }), startOfWeek(today, { weekStartsOn: 1 }));
-  } else {
-    isPrevDisabled = !isAfter(startOfDay(date), startOfDay(today));
-  }
-
-  return (
-    <div className="flex items-center justify-between px-1 pb-3">
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => { if (!isPrevDisabled) onNavigate('PREV'); }}
-          disabled={isPrevDisabled}
-          aria-disabled={isPrevDisabled}
-          className={cn(
-            'p-1.5 rounded transition-colors',
-            isPrevDisabled
-              ? 'cursor-not-allowed opacity-40 text-muted-foreground'
-              : 'hover:bg-muted text-muted-foreground hover:text-foreground',
-          )}
-          aria-label="Previous"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => onNavigate('TODAY')}
-          className="flex items-center gap-1 px-2 py-1.5 rounded text-sm font-medium hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Today"
-        >
-          <CalendarCheck className="h-4 w-4" />
-          {TODAY_LABEL[view] ?? 'Today'}
-        </button>
-        <button
-          onClick={() => onNavigate('NEXT')}
-          className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Next"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
-
-      <span className="text-sm font-semibold">{label}</span>
-
-      <div className="flex items-center gap-1">
-        {(Array.isArray(views) ? views : VIEWS).map((v) => (
-          <button
-            key={v}
-            onClick={() => onView(v)}
-            className={cn(
-              'text-xs font-medium px-3 py-1.5 rounded transition-colors',
-              view === v
-                ? 'bg-primary text-primary-foreground'
-                : 'border border-border text-muted-foreground hover:bg-muted',
-            )}
-          >
-            {VIEW_LABELS[v] ?? v}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function MyEventsPage() {
   const navigate = useNavigate();
   const { isLoading, isError, calendarEvents, retry } = useMyEvents();
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
   const [view, setView] = useState<View>(() =>
     window.innerWidth <= 640 ? 'agenda' : 'month',
   );
   const [date, setDate] = useState(() => new Date());
 
+  // Filter state
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
+  const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('all');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [showPast, setShowPast] = useState(false);
+
   useEffect(() => {
     const handleResize = () => {
-        if (window.innerWidth <= 640) {
+      const mobile = window.innerWidth <= 640;
+      setIsMobile(mobile);
+      if (mobile) {
         setView('agenda');
-        } else {
-        setView(v => v === 'agenda' ? 'month' : v);
-        }
+      } else {
+        setView((v) => (v === 'agenda' ? 'month' : v));
+      }
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const isMobile = useMemo(() => window.innerWidth <= 640, []);
-
   const handleSelectEvent = useCallback(
     (event: CalendarEventItem) => {
+      if (isBefore(event.start, startOfDay(new Date())) && event.role !== 'organizer') return;
       void navigate(`/events/${event.id}`);
     },
     [navigate],
   );
 
-  const handleShowMore = useCallback((_events: CalendarEventItem[], date: Date) => {
-    setDate(date);
+  const handleShowMore = useCallback((_events: CalendarEventItem[], d: Date) => {
+    setDate(d);
     setView('week');
   }, []);
+
+  const filteredEvents = useMemo(() => {
+    return calendarEvents.filter((e) => {
+      if (!showPast && isBefore(e.start, startOfDay(new Date()))) return false;
+      if (roleFilter !== 'all' && e.role !== roleFilter) return false;
+      if (visibilityFilter !== 'all' && e.visibility !== visibilityFilter) return false;
+      if (selectedTags.length > 0 && !selectedTags.some((t) => e.tags?.includes(t))) return false;
+      return true;
+    });
+  }, [calendarEvents, showPast, roleFilter, visibilityFilter, selectedTags]);
 
   if (isLoading) {
     return (
@@ -166,38 +111,63 @@ export default function MyEventsPage() {
     );
   }
 
+  const isFiltered =
+    roleFilter !== 'all' || visibilityFilter !== 'all' || selectedTags.length > 0;
+
   return (
-    <div className="py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">My Events</h1>
-        <p className="mt-1 text-sm text-muted-foreground">View and manage your event calendar</p>
+    <MyEventsContext.Provider value={{ showPast }}>
+      <div className="py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold">My Events</h1>
+          <p className="mt-1 text-sm text-muted-foreground">View and manage your event calendar</p>
+        </div>
+
+        <MyEventsFilters
+          roleFilter={roleFilter}
+          onRoleChange={setRoleFilter}
+          visibilityFilter={visibilityFilter}
+          onVisibilityChange={setVisibilityFilter}
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
+          showPast={showPast}
+          onShowPastChange={setShowPast}
+        />
+
+        {filteredEvents.length === 0 && isFiltered ? (
+          <EmptyState
+            icon={CalendarDays}
+            heading="No events match your filters."
+            subText="Try adjusting the filters above."
+          />
+        ) : (
+          <div className="rounded-lg border border-border bg-card shadow-sm">
+            <Calendar<CalendarEventItem>
+              localizer={localizer}
+              events={filteredEvents}
+              view={view}
+              onView={setView}
+              date={date}
+              onNavigate={setDate}
+              views={isMobile ? ['agenda'] : ['month', 'week', 'agenda']}
+              onSelectEvent={handleSelectEvent}
+              onShowMore={handleShowMore}
+              components={{ toolbar: CalendarToolbar, event: CalendarEventWrapper }}
+              style={{ height: 'calc(100vh - 220px)', minHeight: 500 }}
+              culture="en-GB"
+              titleAccessor="title"
+              startAccessor="start"
+              endAccessor="end"
+              formats={{
+                agendaDateFormat: 'dd/MM/yyyy',
+                dayFormat: 'dd/MM/yyyy',
+                dateFormat: 'dd',
+                timeGutterFormat: 'hh:mm a',
+                agendaTimeRangeFormat: ({ start }: { start: Date }) => format(start, 'hh:mm a'),
+              }}
+            />
+          </div>
+        )}
       </div>
-      <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-      <Calendar<CalendarEventItem>
-        localizer={localizer}
-        events={calendarEvents}
-        view={view}
-        onView={setView}
-        date={date}
-        onNavigate={setDate}
-        views={isMobile ? ['agenda'] : ['month', 'week', 'agenda']}
-        onSelectEvent={handleSelectEvent}
-        onShowMore={handleShowMore}
-        components={{ toolbar: CalendarToolbar, event: CalendarEventWrapper }}
-        style={{ height: 'calc(100vh - 220px)', minHeight: 500 }}
-        culture="en-GB"
-        titleAccessor="title"
-        startAccessor="start"
-        endAccessor="end"
-        formats={{
-          agendaDateFormat: 'dd/MM/yyyy',
-          dayFormat: 'dd/MM/yyyy',
-          dateFormat: 'dd',
-          timeGutterFormat: 'hh:mm a',
-          agendaTimeRangeFormat: ({ start }: { start: Date }) => format(start, 'hh:mm a'),
-        }}
-      />
-      </div>
-    </div>
+    </MyEventsContext.Provider>
   );
 }

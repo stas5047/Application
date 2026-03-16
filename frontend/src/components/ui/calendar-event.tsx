@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, isPast } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getTagColor } from '@/lib/tag-colors';
 import type { CalendarEventItem } from '@/types/calendar.types';
@@ -11,11 +11,13 @@ export function CalendarEvent({ event }: CalendarEventProps) {
   const isOrganizer = event.role === 'organizer';
   const firstTag = event.tags?.[0];
   const tagColor = firstTag ? getTagColor(firstTag) : null;
+  const isPastEvent = isPast(event.start);
 
   return (
     <div
       className={cn(
         'truncate rounded px-1.5 py-0.5 text-xs font-medium',
+        isPastEvent && 'opacity-60',
         tagColor
           ? `${tagColor.bg} ${tagColor.text}`
           : isOrganizer

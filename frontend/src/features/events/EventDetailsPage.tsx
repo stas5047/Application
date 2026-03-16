@@ -103,7 +103,10 @@ export default function EventDetailsPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => void navigate('/events')}
+              onClick={() => {
+                if (window.history.state?.idx > 0) navigate(-1);
+                else void navigate('/events');
+              }}
               className="gap-1"
             >
               <ArrowLeft className="size-4" />

@@ -1,4 +1,4 @@
-import type { EventRole } from './event.types';
+import type { EventRole, EventVisibility } from './event.types';
 import type { TagResponse } from './tag.types';
 
 export interface ApiError {
@@ -14,5 +14,6 @@ export interface MyEventResponse {
   dateTime: string;
   location: string;
   role: EventRole;
+  visibility: EventVisibility;
   tags: TagResponse[];
 }

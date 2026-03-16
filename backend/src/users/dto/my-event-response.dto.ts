@@ -21,6 +21,9 @@ export class MyEventResponseDto {
   @ApiProperty({ enum: ['organizer', 'participant'] })
   role!: 'organizer' | 'participant';
 
+  @ApiProperty({ enum: ['public', 'private'] })
+  visibility!: 'public' | 'private';
+
   @ApiProperty({ type: () => [TagResponseDto] })
   tags!: TagResponseDto[];
 }
